@@ -1,5 +1,7 @@
 package com.example.test.myreceipts.Entity;
 
+import java.util.Map;
+
 /**
  * Created by thomas on 23-04-2018.
  */
@@ -8,20 +10,27 @@ public class User {
 
     private String uid;
     private String email;
-    private String Firstname;
-    private String Lastname;
+    private String firstname;
+    private String lastname;
     private String password;
 
+    public User(Map<String, Object> map)
+    {
+        email = (String)map.get("username");
+        firstname = (String)map.get("firstname");
+        lastname = (String)map.get("lastname");
+    }
 
 
     public User(String uid, String email, String firstname, String lastname, String password) {
         this.uid = uid;
 
         this.email = email;
-        Firstname = firstname;
-        Lastname = lastname;
+        this.firstname = firstname;
+        this.lastname = lastname;
         this.password = password;
     }
+
     public String getUid() {
         return uid;
     }
@@ -29,6 +38,7 @@ public class User {
     public void setUid(String uid) {
         this.uid = uid;
     }
+
     public String getEmail() {
         return email;
     }
@@ -38,19 +48,19 @@ public class User {
     }
 
     public String getFirstname() {
-        return Firstname;
+        return firstname;
     }
 
     public void setFirstname(String firstname) {
-        Firstname = firstname;
+        this.firstname = firstname;
     }
 
     public String getLastname() {
-        return Lastname;
+        return lastname;
     }
 
     public void setLastname(String lastname) {
-        Lastname = lastname;
+        this.lastname = lastname;
     }
 
     public String getPassword() {
