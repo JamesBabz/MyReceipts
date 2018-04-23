@@ -111,6 +111,7 @@ public class SignInActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Log.d("UserLogin", user.getUid());
                             startNewActivity(user.getUid());
 
                         } else {
