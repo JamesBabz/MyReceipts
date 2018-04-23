@@ -13,11 +13,17 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,8 +46,18 @@ public class ImageActivity extends AppCompatActivity {
     File mFile;
     Uri uriSavedImage;
 
+    private StorageReference mStorage;
+
+    boolean setFavorite = true;
+
     TextView name;
     TextView date;
+    TextView location;
+    TextView category;
+
+    ImageButton favorite;
+    Button save;
+
     ImageView ivPicture;
 
     @Override
@@ -52,30 +68,44 @@ public class ImageActivity extends AppCompatActivity {
         name = findViewById(R.id.tvName);
         date = findViewById(R.id.tvDate);
         ivPicture = findViewById(R.id.ivPicture);
+        location = findViewById(R.id.tvLocation);
+        category = findViewById(R.id.tvCategory);
+        favorite = findViewById(R.id.favorite);
+        save = findViewById(R.id.btnSave);
 
+        name.setText("Name:");
+        date.setText("Date:");
+        category.setText("Category:");
+        location.setText("Place");
 
+        mStorage = FirebaseStorage.getInstance().getReference();
+
+        listeners();
+    }
+
+    //Listeners to avoid having them all in onCreate
+    public void listeners()
+    {
         takePicture();
+        isSetFavorite();
+        saveReceipt();
     }
 
     //Creates or check if there is a folder for pictures
-    private String appFolderCheckandCreate(){
+    private String appFolderCheckandCreate() {
 
-        String appFolderPath="";
+        String appFolderPath = "";
         File externalStorage = Environment.getExternalStorageDirectory();
 
-        if (externalStorage.canWrite())
-        {
+        if (externalStorage.canWrite()) {
             appFolderPath = externalStorage.getAbsolutePath() + "/MyApp";
             File dir = new File(appFolderPath);
 
-            if (!dir.exists())
-            {
+            if (!dir.exists()) {
                 dir.mkdirs();
             }
 
-        }
-        else
-        {
+        } else {
             Toast.makeText(this, "  Storage media not found or is full ! ", Toast.LENGTH_LONG).show();
         }
 
@@ -83,8 +113,7 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     //Opens the intent for camera
-    private void takePicture()
-    {
+    private void takePicture() {
         ivPicture.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -105,12 +134,11 @@ public class ImageActivity extends AppCompatActivity {
         final String timeString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cal.getTime());
 
 
-
-        return timeString;}
+        return timeString;
+    }
 
     //Creates the intent
-    private void onClickTakePics()
-    {
+    private void onClickTakePics() {
         mFile = new File(appFolderCheckandCreate(), "img" + getTimeStamp() + ".jpg");
         uriSavedImage = Uri.fromFile(mFile);
 
@@ -132,12 +160,25 @@ public class ImageActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
 
                 exifInterface();
-                name.setText(mFile.toString());
-                date.setText(getTimeStamp());
+
+
+
+                StorageReference filepath = mStorage.child(random());
+                filepath.putFile((bitmapToUriConverter(rotatedBitmap))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
+                    }
+                });
+
+                name.setText("Name: " + mFile.toString());
+                date.setText("Date: " + getTimeStamp());
+                category.setText("Category: Electronics");
+                location.setText("Place: Esbjerg N 6715");
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
 
-            } else
-            if (resultCode == RESULT_CANCELED) {
+            } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Canceled...", Toast.LENGTH_LONG).show();
                 return;
 
@@ -183,8 +224,7 @@ public class ImageActivity extends AppCompatActivity {
     }
 
     //gets the current rotation of the bitmap, rotating it if needed.
-    public void exifInterface()
-    {
+    public void exifInterface() {
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriSavedImage);
         } catch (IOException e) {
@@ -221,4 +261,51 @@ public class ImageActivity extends AppCompatActivity {
         }
     }
 
+    //Set an receipt as favorite
+    public void isSetFavorite() {
+
+        favorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!setFavorite) {
+                    favorite.setImageResource(android.R.drawable.star_big_off);
+                    setFavorite = true;
+                } else if (setFavorite) {
+                    favorite.setImageResource(android.R.drawable.star_big_on);
+                    setFavorite = false;
+                }
+            }
+        });
+    }
+
+    //Saves the receipe on button save click
+    public void saveReceipt()
+    {
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), "This will save the receipe onClick();", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public static String random() {
+        Random generator = new Random();
+        StringBuilder randomStringBuilder = new StringBuilder();
+        int randomLength = generator.nextInt(12);
+        char tempChar;
+        for (int i = 0; i < randomLength; i++){
+            tempChar = (char) (generator.nextInt(96) + 32);
+            randomStringBuilder.append(tempChar);
+        }
+        return randomStringBuilder.toString();
+    }
+
 }
+
+
+
+
+
+
+
