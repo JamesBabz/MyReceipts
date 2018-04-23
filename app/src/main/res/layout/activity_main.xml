@@ -64,7 +64,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tvCatHeader"
+            android:id="@+id/tvGroupHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
