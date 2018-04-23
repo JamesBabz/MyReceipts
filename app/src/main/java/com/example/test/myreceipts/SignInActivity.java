@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.IOException;
+
 
 /**
  * Created by thomas on 16-04-2018.
@@ -78,6 +80,15 @@ public class SignInActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        try {
+                Log.d("UserLogin", currentUser.getUid());
+                startNewActivity(currentUser.getUid());
+
+        } catch (@NonNull Exception exception) {
+            Log.d("UserLogin", "fail");
+        }
+
+
 
     }
     // [END on_start_check_user]
