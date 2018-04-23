@@ -9,13 +9,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     Button btnCapture;
     GridView gridView;
     Spinner spinner;
+    TextView tvGroupHeader;
 
     String[] categories = {
             "Electronics",
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         gridView = findViewById(R.id.gvShowAll);
         btnCapture = findViewById(R.id.btnCapture);
+        tvGroupHeader = findViewById(R.id.tvGroupHeader);
 
 
         createSpinner();
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private void createSpinner() {
         spinner = findViewById(R.id.spinnerSortBy);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.sort_by_array, android.R.layout.simple_spinner_item);
+                R.array.main_sort_by_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
@@ -65,13 +67,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 ButtonAdapter buttonAdapter;
-                if (position == 0) {
-                    buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
-                } else if (position == 1) {
-                    buttonAdapter = new ButtonAdapter(getBaseContext(), cities);
-                } else {
-                    buttonAdapter = new ButtonAdapter(getBaseContext(), null);
+                switch (position) {
+                    case 0:
+                        buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
+                        tvGroupHeader.setText(getResources().getString(R.string.categories_header));
+                        break;
+                    case 1:
+                        buttonAdapter = new ButtonAdapter(getBaseContext(), cities);
+                        tvGroupHeader.setText(getResources().getString(R.string.cities_header));
+                        break;
+                    default:
+                        buttonAdapter = new ButtonAdapter(getBaseContext(), null);
 
+                        break;
                 }
                 gridView.setAdapter(buttonAdapter);
             }
