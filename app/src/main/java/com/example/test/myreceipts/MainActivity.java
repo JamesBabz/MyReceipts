@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnTest;
+    Button btnCapture;
     GridView gridView;
     Spinner spinner;
 
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gridView = findViewById(R.id.gvShowAll);
-        btnTest = findViewById(R.id.btnTest);
+        btnCapture = findViewById(R.id.btnCapture);
 
 
         createSpinner();
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void createListeners() {
-        createTestButtonListener();
+        createCaptureButtonListener();
         createSortListener();
         createFolderListener();
     }
@@ -89,10 +89,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Opens FriendActivity with all information about the selected friend
-    private void createTestButtonListener() {
+    private void createCaptureButtonListener() {
 
-        btnTest.setOnClickListener(new View.OnClickListener() {
+        btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, ImageActivity.class);
