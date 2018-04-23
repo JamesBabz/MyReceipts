@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ImageActivity"></activity>
+        <activity android:name=".ImageGroup"></activity>
     </application>
 
 </manifest>

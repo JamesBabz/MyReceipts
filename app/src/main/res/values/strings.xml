@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MyReceipts</string>
+    <string name="recent_images">Recent Images</string>
+    <string name="cities_header">Cities</string>
+    <string name="categories_header">Categories</string>
+    <string name="sort_by">Sort By: </string>
+    <string-array name="sort_by_array">
+        <item>Categories</item>
+        <item>Cities</item>
+    </string-array>
 </resources>
