@@ -13,7 +13,11 @@ import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.test.myreceipts.BLL.GroupCollectionService;
 import com.example.test.myreceipts.Entity.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,20 +28,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String currentUserId;
 
-    String[] categories = {
-            "Electronics",
-            "Furniture",
-            "Consumables"
-    };
-
-    String[] cities = {
-            "Esbjerg",
-            "Kolding",
-            "Odense",
-            "København",
-            "Århus",
-            "Vejle"
-    };
+    List<String> categories = new ArrayList<String>();
+    List<String> cities = new ArrayList<String>();
 
 
     @Override
@@ -48,12 +40,18 @@ public class MainActivity extends AppCompatActivity {
         btnCapture = findViewById(R.id.btnCapture);
         tvGroupHeader = findViewById(R.id.tvGroupHeader);
 
-
-        createSpinner();
-        createListeners();
         Bundle extras = getIntent().getExtras();
 
         currentUserId = extras.getString("USER");
+
+        GroupCollectionService groupCollectionService = new GroupCollectionService();
+        cities = groupCollectionService.getAllCitiesForUser("tWFxSCtcjQ50wGweZcMU");
+        categories = groupCollectionService.getAllCategoriesForUser("tWFxSCtcjQ50wGweZcMU");
+
+
+        createSpinner();
+        createListeners();
+
     }
 
     private void createSpinner() {
@@ -123,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_top, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -137,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void openProfileView(){
+    private void openProfileView() {
         Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
         intent.putExtra("USER", currentUserId);
         startActivity(intent);

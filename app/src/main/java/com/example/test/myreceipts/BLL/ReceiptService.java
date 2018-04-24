@@ -5,4 +5,5 @@ package com.example.test.myreceipts.BLL;
  */
 
 public class ReceiptService {
+
 }

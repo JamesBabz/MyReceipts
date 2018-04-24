@@ -10,25 +10,27 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by James on 16-04-2018.
  */
 
 public class ButtonAdapter extends BaseAdapter {
     private Context mContext;
-    private String[] groupNames;
-
+    private List<String> groupNames = new ArrayList<String>();
 
 
     // Gets the context so it can be used later
-    public ButtonAdapter(Context c, String[] groupNames) {
+    public ButtonAdapter(Context c, List<String> groupNames) {
         mContext = c;
         this.groupNames = groupNames;
     }
 
     // Total number of things contained within the adapter
     public int getCount() {
-        return groupNames.length;
+        return groupNames.size();
     }
 
     // Require for structure, not really used in my code.
@@ -56,7 +58,7 @@ public class ButtonAdapter extends BaseAdapter {
             btn = (Button) convertView;
         }
 
-        btn.setText(groupNames[position]);
+        btn.setText(groupNames.get(position));
         // filenames is an array of strings
         btn.setTextColor(Color.WHITE);
         btn.setBackgroundColor(Color.DKGRAY);
@@ -68,7 +70,7 @@ public class ButtonAdapter extends BaseAdapter {
                 Toast.makeText(mContext,"HEJEHEJEHEJHEJE", Toast.LENGTH_LONG);
 //                Log.i("test", "text");
                 Intent intent = new Intent(mContext, ImageGroup.class);
-                intent.putExtra("groupName", groupNames[position]);
+                intent.putExtra("groupName", groupNames.get(position));
                 mContext.startActivity(intent);
             }
         });
