@@ -22,6 +22,8 @@ public class ImageGroup extends AppCompatActivity {
     Spinner spinner;
     ScrollView svContainer;
     ImageView ivTestImage;
+    ImageView ivTestImage2;
+    ImageView ivTestImage3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +32,16 @@ public class ImageGroup extends AppCompatActivity {
         tvGroupName = findViewById(R.id.tvGroupName);
         svContainer = findViewById(R.id.svContainer);
         ivTestImage = findViewById(R.id.ivTestImage);
+        ivTestImage2 = findViewById(R.id.ivTestImage2);
+        ivTestImage3 = findViewById(R.id.ivTestImage3);
         tvGroupName.setText(getIntent().getExtras().getString("groupName"));
 
         ReceiptService receiptService = ReceiptService.getInstance();
 
 
         ivTestImage.setImageBitmap(receiptService.getReceipts().get(0).getBitmap());
+        ivTestImage2.setImageBitmap(receiptService.getReceipts().get(1).getBitmap());
+        ivTestImage3.setImageBitmap(receiptService.getReceipts().get(2).getBitmap());
 
 
         createSpinner();
