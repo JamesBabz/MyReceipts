@@ -64,7 +64,6 @@ public class ImageActivity extends AppCompatActivity {
 
     TextView name;
     TextView date;
-    TextView location;
     TextView category;
     EditText etName;
 
@@ -84,7 +83,6 @@ public class ImageActivity extends AppCompatActivity {
         name = findViewById(R.id.tvName);
         date = findViewById(R.id.tvDate);
         ivPicture = findViewById(R.id.ivPicture);
-        location = findViewById(R.id.tvLocation);
         category = findViewById(R.id.tvCategory);
         favorite = findViewById(R.id.favorite);
         save = findViewById(R.id.btnSave);
@@ -93,26 +91,9 @@ public class ImageActivity extends AppCompatActivity {
         name.setText("Name:");
         date.setText("Date:");
         category.setText("Category:");
-        location.setText("Place");
 
         mStorage = FirebaseStorage.getInstance().getReference();
         mDatabase = FirebaseFirestore.getInstance();
-
-
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        mLocation = location;
-                        if (location != null) {
-                            // Logic to handle location object
-                        }
-                    }
-                });
-
 
         listeners();
     }
@@ -195,13 +176,10 @@ public class ImageActivity extends AppCompatActivity {
 
                 exifInterface();
 
-
-                System.out.println(mLocation);
-
                 name.setText("Name: ");
                 date.setText("Date: " + getTimeStamp());
                 category.setText("Category: Electronics");
-                location.setText("Place: " + mLocation);
+
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -327,7 +305,6 @@ public class ImageActivity extends AppCompatActivity {
                 receipt.put("Name", etName.getText().toString());
                 receipt.put("Date", getTimeStamp());
                 receipt.put("Category", "Electronics");
-                receipt.put("Place", "hej");
                 receipt.put("URL", filepath.toString());
                 receipt.put("IsFavorite", setFavorite);
 
