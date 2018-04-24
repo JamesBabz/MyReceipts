@@ -36,6 +36,9 @@ public class UserService {
         db = FirebaseFirestore.getInstance();
     }
 
+    public FirebaseUser getCurrentUser(){
+        return fAuth.getCurrentUser();
+    }
     public void signOut(){
         fAuth.signOut();
     }
@@ -65,7 +68,7 @@ public class UserService {
 
         docRef
                 .update(
-                        "username", user.getEmail(),
+                        "username", user.getUsername(),
                         "firstname", user.getFirstname(),
                         "lastname", user.getLastname())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -81,6 +84,11 @@ public class UserService {
                     }
                 });
 
+    }
+
+    public void newUser(User user)
+    {
+        db.collection("users").document(getCurrentUser().getUid()).set(user);
     }
 
     private void setToast(Context context, CharSequence text){

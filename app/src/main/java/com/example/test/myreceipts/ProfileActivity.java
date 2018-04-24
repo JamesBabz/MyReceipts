@@ -79,7 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
        userService.getUser(currentUserId, context, new Callback() {
            @Override
            public void act(User model) {
-               txtUsername.setText(model.getEmail());
+               txtUsername.setText(model.getUsername());
                txtUsername.setTag(txtUsername.getKeyListener());
                txtUsername.setKeyListener(null);
                txtFirstname.setText(model.getFirstname());

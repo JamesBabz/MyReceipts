@@ -8,40 +8,30 @@ import java.util.Map;
 
 public class User {
 
-    private String uid;
-    private String email;
+    private String username;
     private String firstname;
     private String lastname;
-    private String password;
 
     public User(Map<String, Object> map)
     {
-        email = (String)map.get("username");
+        username = (String)map.get("username");
         firstname = (String)map.get("firstname");
         lastname = (String)map.get("lastname");
     }
 
 
-    public User( String email, String firstname, String lastname) {
-        this.email = email;
+    public User( String username, String firstname, String lastname) {
+        this.username = username;
         this.firstname = firstname;
         this.lastname = lastname;
     }
 
-    public String getUid() {
-        return uid;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFirstname() {
@@ -60,11 +50,5 @@ public class User {
         this.lastname = lastname;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
