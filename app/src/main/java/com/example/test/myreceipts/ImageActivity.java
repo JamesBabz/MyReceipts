@@ -60,6 +60,9 @@ public class ImageActivity extends AppCompatActivity {
 
     ImageView ivPicture;
 
+    GPSTracker gps = new GPSTracker(this);
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,10 +175,16 @@ public class ImageActivity extends AppCompatActivity {
                     }
                 });
 
+                double latitude = gps.getLatitude();
+                double longitude = gps.getLongitude();
+
+                System.out.println(latitude);
+                System.out.println(longitude);
+
                 name.setText("Name: " + mFile.toString());
                 date.setText("Date: " + getTimeStamp());
                 category.setText("Category: Electronics");
-                location.setText("Place: Esbjerg N 6715");
+                location.setText("Place: " + latitude + "," + longitude);
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
 
             } else if (resultCode == RESULT_CANCELED) {

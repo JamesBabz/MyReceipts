@@ -26,7 +26,7 @@ public class GPSTracker implements LocationListener {
     boolean isNetworkEnabled = false;
     // flag for GPS status
     boolean canGetLocation = false;
-    Location location; // location
+    Location location = null; // location
     double latitude; // latitude
     double longitude; // longitude
     double speed,direction;
@@ -39,7 +39,9 @@ public class GPSTracker implements LocationListener {
     public GPSTracker(Context context) {
         this.mContext = context;
         getLocation();
+      //  showSettingsAlert();
     }
+
     public Location getLocation() {
         try {
             locationManager = (LocationManager) mContext
