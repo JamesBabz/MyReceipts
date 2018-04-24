@@ -23,7 +23,9 @@ public class ProfileActivity extends AppCompatActivity {
     private EditText txtUsername;
     private EditText txtFirstname;
     private EditText txtLastname;
-    Button btnTest;
+
+    private EditText txtFirstPassword;
+    private Button btnResetpassword;
 
      private String currentUserId;
 
@@ -36,7 +38,8 @@ public class ProfileActivity extends AppCompatActivity {
         txtUsername = findViewById(R.id.txtProfileEmail);
         txtFirstname = findViewById(R.id.txtProfileFirstname);
         txtLastname = findViewById(R.id.txtProfileLastname);
-        btnTest = findViewById(R.id.btnTestProfile);
+        btnResetpassword = findViewById(R.id.btnResetPassword);
+        txtFirstPassword = findViewById(R.id.txtFirstNewPassword);
         userService = new UserService();
 
         Bundle extras = getIntent().getExtras();
@@ -98,5 +101,16 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void btnUpdateUser(View v){
         updateUser();
+    }
+
+    private void updateUserPassword(){
+        Context context = this;
+        String password = txtFirstPassword.getText().toString();
+        userService.ResetUserPassword(password, context);
+
+    }
+
+    public void btnResetPassword(View v){
+        updateUserPassword();
     }
 }

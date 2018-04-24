@@ -51,6 +51,32 @@
             android:onClick="btnUpdateUser"
             android:text="Update" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:textSize="25dp"
+            android:text="Reset password" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Type the new password" />
+
+        <EditText
+            android:id="@+id/txtFirstNewPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/btnResetPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="btnResetPassword"
+            android:text="Reset password" />
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

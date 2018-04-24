@@ -86,13 +86,28 @@ public class UserService {
 
     }
 
+    public void ResetUserPassword(String password, final Context context){
+        FirebaseUser user = getCurrentUser();
+        user.updatePassword(password)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            setToast(context, "Password reset successful");
+                        } else {
+                            setToast(context, task.getException().getMessage());
+                        }
+                    }
+                });
+    }
+
     public void newUser(User user)
     {
         db.collection("users").document(getCurrentUser().getUid()).set(user);
     }
 
     private void setToast(Context context, CharSequence text){
-        int duration = Toast.LENGTH_SHORT;
+        int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
     }
