@@ -22,13 +22,10 @@ public class User {
     }
 
 
-    public User(String uid, String email, String firstname, String lastname, String password) {
-        this.uid = uid;
-
+    public User( String email, String firstname, String lastname) {
         this.email = email;
         this.firstname = firstname;
         this.lastname = lastname;
-        this.password = password;
     }
 
     public String getUid() {
