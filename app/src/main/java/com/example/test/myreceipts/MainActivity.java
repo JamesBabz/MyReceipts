@@ -1,6 +1,9 @@
 package com.example.test.myreceipts;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,8 +16,17 @@ import android.widget.GridView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.test.myreceipts.BLL.GroupCollectionService;
+import com.example.test.myreceipts.BLL.ReceiptService;
+import com.example.test.myreceipts.Entity.Receipt;
 import com.example.test.myreceipts.Entity.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +60,24 @@ public class MainActivity extends AppCompatActivity {
         cities = groupCollectionService.getAllCitiesForUser("tWFxSCtcjQ50wGweZcMU");
         categories = groupCollectionService.getAllCategoriesForUser("tWFxSCtcjQ50wGweZcMU");
 
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://myreceipts-da3b5.appspot.com/1524494595186");
+        final long SIXTYFOUR_MEGABYTES = 1024 * 1024 * 64;
+        storageRef.getBytes(SIXTYFOUR_MEGABYTES).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                ReceiptService.getInstance().addReceipt(new Receipt(bitmap));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
 
         createSpinner();
         createListeners();
