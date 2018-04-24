@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.location.Location;
+import android.location.LocationListener;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,13 +16,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -31,6 +39,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -40,6 +50,7 @@ import java.util.Random;
 public class ImageActivity extends AppCompatActivity {
 
     private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    String currDate = System.currentTimeMillis() + "";
 
     Bitmap bitmap;
     Bitmap rotatedBitmap;
@@ -47,18 +58,23 @@ public class ImageActivity extends AppCompatActivity {
     Uri uriSavedImage;
 
     private StorageReference mStorage;
+    private FirebaseFirestore mDatabase;
 
-    boolean setFavorite = true;
+    boolean setFavorite = false;
 
     TextView name;
     TextView date;
     TextView location;
     TextView category;
+    EditText etName;
 
     ImageButton favorite;
     Button save;
-
     ImageView ivPicture;
+
+    Location mLocation;
+
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +88,7 @@ public class ImageActivity extends AppCompatActivity {
         category = findViewById(R.id.tvCategory);
         favorite = findViewById(R.id.favorite);
         save = findViewById(R.id.btnSave);
+        etName = findViewById(R.id.etName);
 
         name.setText("Name:");
         date.setText("Date:");
@@ -79,6 +96,23 @@ public class ImageActivity extends AppCompatActivity {
         location.setText("Place");
 
         mStorage = FirebaseStorage.getInstance().getReference();
+        mDatabase = FirebaseFirestore.getInstance();
+
+
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        mLocation = location;
+                        if (location != null) {
+                            // Logic to handle location object
+                        }
+                    }
+                });
+
 
         listeners();
     }
@@ -162,20 +196,12 @@ public class ImageActivity extends AppCompatActivity {
                 exifInterface();
 
 
+                System.out.println(mLocation);
 
-                StorageReference filepath = mStorage.child(random());
-                filepath.putFile((bitmapToUriConverter(rotatedBitmap))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
-                    }
-                });
-
-                name.setText("Name: " + mFile.toString());
+                name.setText("Name: ");
                 date.setText("Date: " + getTimeStamp());
                 category.setText("Category: Electronics");
-                location.setText("Place: Esbjerg N 6715");
+                location.setText("Place: " + mLocation);
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -268,10 +294,10 @@ public class ImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!setFavorite) {
-                    favorite.setImageResource(android.R.drawable.star_big_off);
+                    favorite.setImageResource(android.R.drawable.star_big_on);
                     setFavorite = true;
                 } else if (setFavorite) {
-                    favorite.setImageResource(android.R.drawable.star_big_on);
+                    favorite.setImageResource(android.R.drawable.star_big_off);
                     setFavorite = false;
                 }
             }
@@ -284,24 +310,36 @@ public class ImageActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(), "This will save the receipe onClick();", Toast.LENGTH_LONG).show();
+
+                StorageReference filepath = mStorage.child(currDate);
+                filepath.putFile((bitmapToUriConverter(rotatedBitmap))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
+                    }
+                });
+
+                String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                Map<String, Object> receipt = new HashMap<>();
+                receipt.put("UID", user);
+                receipt.put("Name", etName.getText().toString());
+                receipt.put("Date", getTimeStamp());
+                receipt.put("Category", "Electronics");
+                receipt.put("Place", "hej");
+                receipt.put("URL", filepath.toString());
+                receipt.put("IsFavorite", setFavorite);
+
+                mDatabase.collection("receipts").add(receipt);
+
+                Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
             }
         });
     }
-
-    public static String random() {
-        Random generator = new Random();
-        StringBuilder randomStringBuilder = new StringBuilder();
-        int randomLength = generator.nextInt(12);
-        char tempChar;
-        for (int i = 0; i < randomLength; i++){
-            tempChar = (char) (generator.nextInt(96) + 32);
-            randomStringBuilder.append(tempChar);
-        }
-        return randomStringBuilder.toString();
     }
 
-}
+
 
 
 
