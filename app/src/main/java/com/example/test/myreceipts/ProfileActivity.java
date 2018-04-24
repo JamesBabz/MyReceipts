@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.test.myreceipts.BLL.Callback;
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,6 +23,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.concurrent.Callable;
 
 /**
  * Created by thomas on 23-04-2018.
@@ -89,31 +92,20 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void fillOutTextViews()
     {
-        DocumentReference docRef = db.collection("users").document(currentUserId);
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        newUser = new User(document.getData());
-                        txtFirstname.setText(newUser.getFirstname());
-                        txtUsername.setText(newUser.getEmail());
-                        txtLastname.setText(newUser.getLastname());
-                    } else {
-                        Log.d("DATAUSER", "No such document");
-                    }
-                } else {
-                    Log.d("DATAUSER", "get failed with ", task.getException());
-                }
-            }
-        });
+       userService.getUser(currentUserId, new Callback() {
+           @Override
+           public void act(User model) {
+               txtUsername.setText(model.getEmail());
+               txtFirstname.setText(model.getFirstname());
+               txtLastname.setText(model.getLastname());
+           }
+           });
+
     }
 
     private void updateUser(){
         DocumentReference docRef = db.collection("users").document(currentUserId);
 
-// Set the "isCapital" field of the city 'DC'
         docRef
                 .update(
                         "username", txtUsername.getText().toString(),
