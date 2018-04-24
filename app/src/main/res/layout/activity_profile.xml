@@ -48,8 +48,8 @@
             android:id="@+id/btnTestProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="testShit"
-            android:text="test" />
+            android:onClick="btnUpdateUser"
+            android:text="Update" />
 
     </LinearLayout>
 

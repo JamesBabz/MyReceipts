@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.test.myreceipts.BLL.UserService;
+import com.example.test.myreceipts.Entity.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,6 +35,7 @@ import java.io.IOException;
 public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "EmailPassword";
+    private UserService userService;
 
     private TextView headLine;
     private EditText mEmailField;
@@ -56,6 +59,8 @@ public class SignInActivity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel);
         btnSignUp.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
+
+        userService = new UserService();
 
         // [START config_signin]
         // Configure Google Sign In
@@ -94,13 +99,15 @@ public class SignInActivity extends AppCompatActivity {
     // [END on_start_check_user]
 
     public void btnCreateAccount(View v){
-        createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
+        String email = mEmailField.getText().toString();
+        createAccount(email, mPasswordField.getText().toString());
     }
     private void createAccount(String email, String password) {
         if (!validateForm())
         {
             return;
         }
+
 
         // [START create_user_with_email]
         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -110,8 +117,11 @@ public class SignInActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            FirebaseUser user = userService.getCurrentUser();
                             Log.d("UserLogin", user.getUid());
+                            User newUser = new User(user.getEmail(), "", "");
+
+                            userService.newUser(newUser);
                             startNewActivity(user.getUid());
 
                         } else {
@@ -162,6 +172,7 @@ public class SignInActivity extends AppCompatActivity {
                 });
         // [END sign_in_with_email]
     }
+
 
 
 
