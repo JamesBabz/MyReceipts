@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +44,7 @@ public class SignInActivity extends AppCompatActivity {
     Button btnSignIn;
     Button btnSignUp;
     Button btnCancel;
+    ProgressBar progressBar;
 
     private FirebaseAuth firebaseAuth;
     private GoogleSignInClient mGoogleSignInClient;
@@ -57,8 +59,10 @@ public class SignInActivity extends AppCompatActivity {
         btnSignIn = findViewById(R.id.btnSignIn);
         btnSignUp = findViewById(R.id.btnSignUp);
         btnCancel = findViewById(R.id.btnCancel);
+        progressBar = findViewById(R.id.progressBar);
         btnSignUp.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
 
         userService = new UserService();
 
@@ -108,7 +112,8 @@ public class SignInActivity extends AppCompatActivity {
             return;
         }
 
-
+        btnSignUp.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE);
         // [START create_user_with_email]
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -116,19 +121,16 @@ public class SignInActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = userService.getCurrentUser();
-                            Log.d("UserLogin", user.getUid());
-                            User newUser = new User(user.getEmail(), "", "");
+                            User newUser = new User(user.getUid(),user.getEmail(), "", "");
 
-                            userService.newUser(newUser);
+                            userService.updateUser(newUser);
                             startNewActivity(user.getUid());
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignInActivity.this, task.getException().getMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -147,6 +149,9 @@ public class SignInActivity extends AppCompatActivity {
             return;
         }
 
+        btnSignIn.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE);
+
         // [START sign_in_with_email]
         firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -154,13 +159,11 @@ public class SignInActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             startNewActivity(user.getUid());
 
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_LONG).show();
                         }

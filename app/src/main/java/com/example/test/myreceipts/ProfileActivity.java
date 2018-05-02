@@ -14,6 +14,8 @@ import android.widget.EditText;
 import com.example.test.myreceipts.BLL.Callback;
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.User;
+import com.google.firebase.auth.FirebaseUser;
+
 /**
  * Created by thomas on 23-04-2018.
  */
@@ -23,8 +25,11 @@ public class ProfileActivity extends AppCompatActivity {
     private EditText txtUsername;
     private EditText txtFirstname;
     private EditText txtLastname;
-    Button btnTest;
 
+    private EditText txtFirstPassword;
+    private Button btnResetpassword;
+    private Button btnUpdateUser;
+private boolean isThereAnUser = true;
      private String currentUserId;
 
      private UserService userService;
@@ -36,12 +41,13 @@ public class ProfileActivity extends AppCompatActivity {
         txtUsername = findViewById(R.id.txtProfileEmail);
         txtFirstname = findViewById(R.id.txtProfileFirstname);
         txtLastname = findViewById(R.id.txtProfileLastname);
-        btnTest = findViewById(R.id.btnTestProfile);
+        btnResetpassword = findViewById(R.id.btnResetPassword);
+        txtFirstPassword = findViewById(R.id.txtFirstNewPassword);
+        btnUpdateUser = findViewById(R.id.btnUpdateProfile);
         userService = new UserService();
 
         Bundle extras = getIntent().getExtras();
         currentUserId = extras.getString("USER");
-        Log.d("userId", currentUserId+"");
 
         fillOutTextViews();
 
@@ -75,13 +81,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void fillOutTextViews()
     {
+        txtUsername.setText(userService.getCurrentUser().getEmail());
+        txtUsername.setTag(txtUsername.getKeyListener());
+        txtUsername.setKeyListener(null);
         Context context = this;
        userService.getUser(currentUserId, context, new Callback() {
            @Override
            public void act(User model) {
-               txtUsername.setText(model.getUsername());
-               txtUsername.setTag(txtUsername.getKeyListener());
-               txtUsername.setKeyListener(null);
+               isThereAnUser = true;
                txtFirstname.setText(model.getFirstname());
                txtLastname.setText(model.getLastname());
            }
@@ -91,12 +98,23 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void updateUser(){
 
-        Context context = this;
-        User updatedUser = new User(txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
-        userService.updateUser(currentUserId, context, updatedUser);
+        User updatedUser = new User(currentUserId,txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
+      userService.updateUser(updatedUser);
     }
 
     public void btnUpdateUser(View v){
         updateUser();
+    }
+
+    private void updateUserPassword(){
+        Context context = this;
+        String password = txtFirstPassword.getText().toString();
+        btnResetpassword.setEnabled(false);
+        userService.ResetUserPassword(password, context);
+
+    }
+
+    public void btnResetPassword(View v){
+        updateUserPassword();
     }
 }
