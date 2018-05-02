@@ -36,7 +36,7 @@ public class ImageGroup extends AppCompatActivity {
         ivTestImage3 = findViewById(R.id.ivTestImage3);
         tvGroupName.setText(getIntent().getExtras().getString("groupName"));
 
-        ReceiptService receiptService = ReceiptService.getInstance();
+        ReceiptService receiptService = new ReceiptService();
 
 
         ivTestImage.setImageBitmap(receiptService.getReceipts().get(0).getBitmap());
