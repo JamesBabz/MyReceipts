@@ -43,6 +43,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Jacob Enemark on 16-04-2018.
  */
@@ -62,31 +65,21 @@ public class ImageActivity extends AppCompatActivity {
 
     boolean setFavorite = false;
 
-    TextView name;
-    TextView date;
-    TextView category;
-    EditText etName;
+    @BindView(R.id.tvName) TextView name;
+    @BindView(R.id.tvDate) TextView date;
+    @BindView(R.id.ivPicture) ImageView ivPicture;
+    @BindView(R.id.tvCategory) TextView category;
+    @BindView(R.id.favorite) ImageButton favorite;
+    @BindView(R.id.btnSave) TextView save;
+    @BindView(R.id.etName) TextView etName;
 
-    ImageButton favorite;
-    Button save;
-    ImageView ivPicture;
-
-    Location mLocation;
-
-    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_activity);
 
-        name = findViewById(R.id.tvName);
-        date = findViewById(R.id.tvDate);
-        ivPicture = findViewById(R.id.ivPicture);
-        category = findViewById(R.id.tvCategory);
-        favorite = findViewById(R.id.favorite);
-        save = findViewById(R.id.btnSave);
-        etName = findViewById(R.id.etName);
+        ButterKnife.bind(this);
 
         name.setText("Name:");
         date.setText("Date:");
