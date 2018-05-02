@@ -285,11 +285,11 @@ public class ImageActivity extends AppCompatActivity {
 
                 Map<String, Object> receipt = new HashMap<>();
                 receipt.put("UID", user);
-                receipt.put("Name", etName.getText().toString());
-                receipt.put("Date", getTimeStamp());
-                receipt.put("Category", "Electronics");
+                receipt.put("name", etName.getText().toString());
+                receipt.put("date", getTimeStamp());
+                receipt.put("category", "Electronics");
                 receipt.put("URL", filepath.toString());
-                receipt.put("IsFavorite", setFavorite);
+                receipt.put("isFavorite", setFavorite);
 
                 mDatabase.collection("receipts").add(receipt);
 
