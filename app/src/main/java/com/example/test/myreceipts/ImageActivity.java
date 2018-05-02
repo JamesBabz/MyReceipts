@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -16,9 +17,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.test.myreceipts.Entity.Receipt;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -29,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import butterknife.BindView;
@@ -282,22 +291,61 @@ public class ImageActivity extends AppCompatActivity {
                 });
 
                 String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                CheckForCategoryAndCreate(filepath, user);
 
-                Map<String, Object> receipt = new HashMap<>();
-                receipt.put("UID", user);
-                receipt.put("name", etName.getText().toString());
-                receipt.put("date", getTimeStamp());
-                receipt.put("category", "Electronics");
-                receipt.put("URL", filepath.toString());
-                receipt.put("isFavorite", setFavorite);
 
-                mDatabase.collection("receipts").add(receipt);
-
-                Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
             }
         });
     }
+
+
+
+
+
+
+    private void CheckForCategoryAndCreate(final StorageReference filepath, final String user) {
+        //Hardcoded category
+        final String hardcodedCategory = "Electronics";
+        final String[] categoryId = new String[1];
+
+        mDatabase.collection("categories").whereEqualTo("name", hardcodedCategory).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                if(queryDocumentSnapshots.isEmpty()){
+                    Map<String, Object> category = new HashMap<>();
+                    category.put("name", hardcodedCategory);
+                    category.put("imagePath","");
+                    Task<DocumentReference> addedCategory = mDatabase.collection("categories").add(category);
+                    addedCategory.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            categoryId[0] = documentReference.getId();
+                            AddReceipt(filepath, user, categoryId[0]);
+                        }
+                    });
+                }else{
+                    categoryId[0] = queryDocumentSnapshots.getDocuments().get(0).get("name").toString();
+                    AddReceipt(filepath, user, categoryId[0]);
+                }
+            }
+        });
     }
+
+    private void AddReceipt(StorageReference filepath, String user, String categoryId) {
+        Map<String, Object> receipt = new HashMap<>();
+        receipt.put("UID", user);
+        receipt.put("name", etName.getText().toString());
+        receipt.put("date", getTimeStamp());
+        receipt.put("category", categoryId);
+        receipt.put("URL", filepath.toString());
+        receipt.put("isFavorite", setFavorite);
+
+        mDatabase.collection("receipts").add(receipt);
+
+        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
+    }
+
+}
 
 
 
