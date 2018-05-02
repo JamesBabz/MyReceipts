@@ -53,8 +53,6 @@ public class UserService {
                     if (document.exists()) {
                         returnUser = new User(document.getData());
                         callback.act(returnUser);
-                    } else {
-                        setToast(context, "No such document");
                     }
                 } else {
                     setToast(context, task.getException().toString());
@@ -63,28 +61,6 @@ public class UserService {
         });
     }
 
-    public void updateUser(String currentUserId, final Context context, User user){
-        DocumentReference docRef = db.collection("users").document(currentUserId);
-
-        docRef
-                .update(
-                        "username", user.getUsername(),
-                        "firstname", user.getFirstname(),
-                        "lastname", user.getLastname())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        setToast(context, "Update successful");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        setToast(context, e.getMessage());
-                    }
-                });
-
-    }
 
     public void ResetUserPassword(String password, final Context context){
         FirebaseUser user = getCurrentUser();
@@ -101,7 +77,7 @@ public class UserService {
                 });
     }
 
-    public void newUser(User user)
+    public void updateUser(User user)
     {
         db.collection("users").document(getCurrentUser().getUid()).set(user);
     }
