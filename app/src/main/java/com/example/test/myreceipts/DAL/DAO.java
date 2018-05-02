@@ -30,7 +30,6 @@ public class DAO {
 
     public List<Receipt> getAllReceiptsForUser(String UID) {
         List<Receipt> returnList = new ArrayList<>();
-        Log.d("TAG", "START: " + UID);
 
         mStore.collection(RECEIPTS_COLLECTION)
                 .whereEqualTo("UID", UID)
@@ -40,8 +39,6 @@ public class DAO {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("TAG", document.getId() + " => " + document.getData());
-
                                 // Create the receipt
                                 Receipt receipt = new Receipt();
                                 receipt.setName(document.get("name").toString());
