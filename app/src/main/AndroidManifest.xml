@@ -23,7 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ImageActivity"></activity>
+        <activity android:name=".ImageActivity"
+            android:label="Ny kvittering"
+            ></activity>
         <activity android:name=".ImageGroup"></activity>
         <activity android:name=".MainActivity"></activity>
         <activity android:name=".ProfileActivity"></activity>
