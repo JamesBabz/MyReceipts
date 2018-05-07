@@ -35,7 +35,6 @@ public class MainActivity extends CustomMenu {
     private String currentUserId;
 
     List<String> categories = new ArrayList<>();
-    List<Receipt> receipts = new ArrayList<>();
 
     public MainActivity() {
         super(false, true);
@@ -53,11 +52,7 @@ public class MainActivity extends CustomMenu {
         Bundle extras = getIntent().getExtras();
         currentUserId = extras.getString("USER");
 
-
         ReceiptService receiptService = new ReceiptService();
-
-        receipts = receiptService.getAllReceiptsForUser(currentUserId);
-        categories = receiptService.getAllCategoriesForUser(currentUserId);
 
         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
         gridView.setAdapter(buttonAdapter);
