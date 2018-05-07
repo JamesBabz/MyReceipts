@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.ReceiptService;
@@ -19,7 +20,7 @@ import java.util.List;
 
 public class MainActivity extends CustomMenu {
 
-    Button btnCapture;
+    ImageView btnCapture;
     GridView gridView;
     TextView tvGroupHeader;
 
