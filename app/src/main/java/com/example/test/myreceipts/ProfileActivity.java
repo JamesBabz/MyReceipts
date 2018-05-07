@@ -25,7 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * Created by thomas on 23-04-2018.
  */
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends CustomMenu {
 
     private EditText txtUsername;
     private EditText txtFirstname;
@@ -58,30 +58,7 @@ private boolean isThereAnUser = true;
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_top, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.optSignOut:
-                signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void signOut(){
-        userService.signOut();
-        Intent intent = new Intent(ProfileActivity.this, SignInActivity.class);
-        startActivity(intent);
-    }
 
 
     private void fillOutTextViews()
@@ -102,10 +79,7 @@ private boolean isThereAnUser = true;
     }
 
     private void updateUser(){
-        String username = txtUsername.getText().toString();
-        String firstname = txtFirstname.getText().toString();
-        String lastname = txtLastname.getText().toString();
-        User updatedUser = new User(currentUserId, username, firstname, lastname);
+        User updatedUser = new User(currentUserId,txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
       userService.updateUser(updatedUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
           @Override
           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
