@@ -27,7 +27,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * Created by thomas on 16-04-2018.
  */
 
-public class SignInActivity extends CustomMenu {
+public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "EmailPassword";
     private UserService userService;

@@ -17,10 +17,14 @@ import com.google.firebase.auth.FirebaseAuth;
 public class CustomMenu extends AppCompatActivity {
 
     UserService mUserService;
+    boolean backBtn;
+    boolean profileMenuItem;
 
-    public CustomMenu()
+    public CustomMenu(Boolean backBtn, Boolean profileMenuItem)
     {
         mUserService = new UserService();
+        this.backBtn = backBtn;
+        this.profileMenuItem = profileMenuItem;
     }
 
     @Override
@@ -28,7 +32,13 @@ public class CustomMenu extends AppCompatActivity {
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_top, menu);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if(backBtn) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        if(!profileMenuItem) {
+            MenuItem item = menu.findItem(R.id.optProfile);
+            item.setVisible(false);
+        }
         return true;
     }
 
