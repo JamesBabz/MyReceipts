@@ -59,6 +59,7 @@ public class ImageActivity extends AppCompatActivity {
 
     private StorageReference mStorage;
     private FirebaseFirestore mDatabase;
+    private String mTimestamp;
 
     boolean setFavorite = false;
 
@@ -86,6 +87,7 @@ public class ImageActivity extends AppCompatActivity {
         mDatabase = FirebaseFirestore.getInstance();
 
         listeners();
+        mTimestamp = getTimeStamp();
     }
 
     //Listeners to avoid having them all in onCreate
@@ -146,7 +148,7 @@ public class ImageActivity extends AppCompatActivity {
 
     //Creates the intent
     private void onClickTakePics() {
-        mFile = new File(appFolderCheckandCreate(), "img" + getTimeStamp() + ".jpg");
+        mFile = new File(appFolderCheckandCreate(), "img" + mTimestamp + ".jpg");
         uriSavedImage = Uri.fromFile(mFile);
 
         // create Intent to take a picture
@@ -169,7 +171,7 @@ public class ImageActivity extends AppCompatActivity {
                 exifInterface();
 
                 name.setText("Name: ");
-                date.setText("Date: " + getTimeStamp());
+                date.setText("Date: " + mTimestamp);
                 category.setText("Category: Electronics");
 
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
@@ -277,7 +279,12 @@ public class ImageActivity extends AppCompatActivity {
     //Saves the receipe on button save click
     public void saveReceipt()
     {
+        final Map<String, Boolean> exists = new HashMap<>();
+        exists.put("exists", true);
         save.setOnClickListener(new View.OnClickListener() {
+
+            String hardcodedCategory = "Electronics";
+            String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
             @Override
             public void onClick(View view) {
 
@@ -287,11 +294,19 @@ public class ImageActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
+                        String storageuid = taskSnapshot.getMetadata().getCreationTimeMillis() + "";
+                        mDatabase.collection("users").document(user).collection("categories").document(hardcodedCategory).collection("fileuids").add(storageuid);
+//                                document(storageuid).set(exists);
+
+                        mDatabase.collection("users").document(user).collection("allFiles").document(storageuid).collection("fileuids").document(mTimestamp).set(exists);
                     }
                 });
 
-                String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                CheckForCategoryAndCreate(filepath, user);
+
+
+
+
+               // CheckForCategoryAndCreate(filepath, user);
 
 
             }
@@ -335,12 +350,13 @@ public class ImageActivity extends AppCompatActivity {
         Map<String, Object> receipt = new HashMap<>();
         receipt.put("UID", user);
         receipt.put("name", etName.getText().toString());
-        receipt.put("date", getTimeStamp());
+        receipt.put("date", mTimestamp);
         receipt.put("category", categoryId);
         receipt.put("URL", filepath.toString());
         receipt.put("isFavorite", setFavorite);
 
         mDatabase.collection("receipts").add(receipt);
+//        DocumentReference cat = mDatabase.collection("users").document(user).collection("categories").document(categoryId).set(new);
 
         Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
     }
