@@ -86,6 +86,10 @@ public class ImageActivity extends CustomMenu {
     @BindView(R.id.etName)
     TextView etName;
 
+    public ImageActivity() {
+        super(true, true);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

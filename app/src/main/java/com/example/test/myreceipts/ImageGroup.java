@@ -25,6 +25,10 @@ public class ImageGroup extends CustomMenu {
     ImageView ivTestImage2;
     ImageView ivTestImage3;
 
+    public ImageGroup() {
+        super(true, true);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

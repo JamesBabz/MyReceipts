@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +37,10 @@ public class MainActivity extends CustomMenu {
     List<String> categories = new ArrayList<>();
     List<Receipt> receipts = new ArrayList<>();
 
+    public MainActivity() {
+        super(false, true);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,18 @@ public class MainActivity extends CustomMenu {
 
         Bundle extras = getIntent().getExtras();
         currentUserId = extras.getString("USER");
+
+
+        ReceiptService receiptService = new ReceiptService();
+
+        receipts = receiptService.getAllReceiptsForUser(currentUserId);
+        categories = receiptService.getAllCategoriesForUser(currentUserId);
+
+        ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
+        gridView.setAdapter(buttonAdapter);
+
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         createListeners();
     }
 
@@ -90,5 +107,23 @@ public class MainActivity extends CustomMenu {
         });
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
+
+    @Override
+    public void onBackPressed() {
+        Intent setIntent = new Intent(Intent.ACTION_MAIN);
+        setIntent.addCategory(Intent.CATEGORY_HOME);
+        setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(setIntent);
+    }
 }
