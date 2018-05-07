@@ -22,6 +22,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by thomas on 23-04-2018.
  */
@@ -77,15 +80,22 @@ public class UserService {
                 });
     }
 
-    public void updateUser(User user)
+    public Task updateUser(User user)
     {
-        db.collection("users").document(getCurrentUser().getUid()).set(user);
+        return db.collection("users").document(getCurrentUser().getUid()).set(user);
     }
 
     private void setToast(Context context, CharSequence text){
         int duration = Toast.LENGTH_LONG;
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
+    }
+
+    public void setFavoritesFolder(){
+        Map<String, Integer> map = new HashMap<>();
+
+        map.put("fileId", 0);
+        db.collection("users").document(getCurrentUser().getUid()).collection("categories").document("favorites").collection("fileIds").add(map);
     }
 
 }

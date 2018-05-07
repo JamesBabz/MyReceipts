@@ -25,6 +25,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.IOException;
 
@@ -124,7 +125,13 @@ public class SignInActivity extends AppCompatActivity {
                             FirebaseUser user = userService.getCurrentUser();
                             User newUser = new User(user.getUid(),user.getEmail(), "", "");
 
-                            userService.updateUser(newUser);
+                            userService.updateUser(newUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    userService.setFavoritesFolder();
+                                }
+                            }));
+
                             startNewActivity(user.getUid());
 
                         } else {
