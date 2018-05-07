@@ -59,6 +59,7 @@ public class ImageActivity extends AppCompatActivity {
 
     private StorageReference mStorage;
     private FirebaseFirestore mDatabase;
+    private String mTimestamp;
 
     boolean setFavorite = false;
 
@@ -86,6 +87,7 @@ public class ImageActivity extends AppCompatActivity {
         mDatabase = FirebaseFirestore.getInstance();
 
         listeners();
+        mTimestamp = getTimeStamp();
     }
 
     //Listeners to avoid having them all in onCreate
@@ -146,7 +148,7 @@ public class ImageActivity extends AppCompatActivity {
 
     //Creates the intent
     private void onClickTakePics() {
-        mFile = new File(appFolderCheckandCreate(), "img" + getTimeStamp() + ".jpg");
+        mFile = new File(appFolderCheckandCreate(), "img" + mTimestamp + ".jpg");
         uriSavedImage = Uri.fromFile(mFile);
 
         // create Intent to take a picture
@@ -169,7 +171,7 @@ public class ImageActivity extends AppCompatActivity {
                 exifInterface();
 
                 name.setText("Name: ");
-                date.setText("Date: " + getTimeStamp());
+                date.setText("Date: " + mTimestamp);
                 category.setText("Category: Electronics");
 
                 ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
@@ -277,7 +279,12 @@ public class ImageActivity extends AppCompatActivity {
     //Saves the receipe on button save click
     public void saveReceipt()
     {
+        final Map<String, Boolean> exists = new HashMap<>();
+        exists.put("exists", true);
         save.setOnClickListener(new View.OnClickListener() {
+
+            String hardcodedCategory = "Electronics";
+            String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
             @Override
             public void onClick(View view) {
 
@@ -287,62 +294,16 @@ public class ImageActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
+                        String storageuid = taskSnapshot.getMetadata().getCreationTimeMillis() + "";
+                        mDatabase.collection("users").document(user).collection("categories").document(hardcodedCategory).collection("fileuids").document(storageuid).set(exists);
+
+                        mDatabase.collection("users").document(user).collection("allFiles").document(storageuid).collection("fileuids").document(mTimestamp).set(exists);
+                        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
                     }
                 });
 
-                String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                CheckForCategoryAndCreate(filepath, user);
-
-
             }
         });
-    }
-
-
-
-
-
-
-    private void CheckForCategoryAndCreate(final StorageReference filepath, final String user) {
-        //Hardcoded category
-        final String hardcodedCategory = "Electronics";
-        final String[] categoryId = new String[1];
-
-        mDatabase.collection("categories").whereEqualTo("name", hardcodedCategory).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if(queryDocumentSnapshots.isEmpty()){
-                    Map<String, Object> category = new HashMap<>();
-                    category.put("name", hardcodedCategory);
-                    category.put("imagePath","");
-                    Task<DocumentReference> addedCategory = mDatabase.collection("categories").add(category);
-                    addedCategory.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            categoryId[0] = documentReference.getId();
-                            AddReceipt(filepath, user, categoryId[0]);
-                        }
-                    });
-                }else{
-                    categoryId[0] = queryDocumentSnapshots.getDocuments().get(0).get("name").toString();
-                    AddReceipt(filepath, user, categoryId[0]);
-                }
-            }
-        });
-    }
-
-    private void AddReceipt(StorageReference filepath, String user, String categoryId) {
-        Map<String, Object> receipt = new HashMap<>();
-        receipt.put("UID", user);
-        receipt.put("name", etName.getText().toString());
-        receipt.put("date", getTimeStamp());
-        receipt.put("category", categoryId);
-        receipt.put("URL", filepath.toString());
-        receipt.put("isFavorite", setFavorite);
-
-        mDatabase.collection("receipts").add(receipt);
-
-        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
     }
 
 }
