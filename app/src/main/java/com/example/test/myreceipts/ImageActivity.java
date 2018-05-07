@@ -1,5 +1,9 @@
 package com.example.test.myreceipts;
+<<<<<<< HEAD
 import android.app.Activity;
+=======
+
+>>>>>>> Development
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.test.myreceipts.BLL.ImageHandler;
+import com.example.test.myreceipts.BLL.ReceiptService;
 import com.example.test.myreceipts.Entity.Receipt;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,8 +35,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,8 +49,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import java.util.UUID;
 
 /**
  * Created by Jacob Enemark on 16-04-2018.
@@ -58,19 +69,24 @@ public class ImageActivity extends CustomMenu {
     File mFile;
     Uri uriSavedImage;
 
-    private StorageReference mStorage;
-    private FirebaseFirestore mDatabase;
     private String mTimestamp;
+    private ImageHandler imgHandler;
+    private ReceiptService receiptService;
 
     boolean setFavorite = false;
 
-    @BindView(R.id.tvName) TextView name;
-    @BindView(R.id.tvDate) TextView date;
-    @BindView(R.id.ivPicture) ImageView ivPicture;
-    @BindView(R.id.tvCategory) TextView category;
-    @BindView(R.id.favorite) ImageButton favorite;
-    @BindView(R.id.btnSave) TextView save;
-    @BindView(R.id.etName) TextView etName;
+    @BindView(R.id.tvDate)
+    TextView date;
+    @BindView(R.id.ivPicture)
+    ImageView ivPicture;
+    @BindView(R.id.tvCategory)
+    TextView category;
+    @BindView(R.id.favorite)
+    ImageButton favorite;
+    @BindView(R.id.btnSave)
+    TextView save;
+    @BindView(R.id.etName)
+    TextView etName;
 
 
     @Override
@@ -80,20 +96,18 @@ public class ImageActivity extends CustomMenu {
 
         ButterKnife.bind(this);
 
-        name.setText("Name:");
         date.setText("Date:");
         category.setText("Category:");
 
-        mStorage = FirebaseStorage.getInstance().getReference();
-        mDatabase = FirebaseFirestore.getInstance();
+        receiptService = new ReceiptService();
 
         listeners();
         mTimestamp = getTimeStamp();
+        imgHandler = new ImageHandler();
     }
 
     //Listeners to avoid having them all in onCreate
-    public void listeners()
-    {
+    public void listeners() {
         takePicture();
         isSetFavorite();
         saveReceipt();
@@ -113,9 +127,7 @@ public class ImageActivity extends CustomMenu {
                 dir.mkdirs();
             }
 
-        }
-        else
-        {
+        } else {
             Toast.makeText(this, "  Storage media not found or is full ! ", Toast.LENGTH_LONG).show();
         }
 
@@ -171,11 +183,10 @@ public class ImageActivity extends CustomMenu {
 
                 exifInterface();
 
-                name.setText("Name: ");
                 date.setText("Date: " + mTimestamp);
                 category.setText("Category: Electronics");
 
-                ivPicture.setImageURI(bitmapToUriConverter(rotatedBitmap));
+                ivPicture.setImageURI(imgHandler.bitmapToUriConverter(getBaseContext(), rotatedBitmap));
 
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Canceled...", Toast.LENGTH_LONG).show();
@@ -186,41 +197,6 @@ public class ImageActivity extends CustomMenu {
         }
     }
 
-    //gets the bitmap and rotate it
-    public static Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
-                matrix, true);
-    }
-
-
-    //get the bitmaps uri, to save as string in DB
-    public Uri bitmapToUriConverter(Bitmap mBitmap) {
-        Uri uri = null;
-        try {
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-            Bitmap newBitmap = Bitmap.createScaledBitmap(mBitmap, mBitmap.getWidth(), mBitmap.getHeight(), true);
-            File file = new File(this.getFilesDir(), "Image"
-                    + new Random().nextInt() + ".jpeg");
-            FileOutputStream out = this.openFileOutput(file.getName(),
-                    Context.MODE_WORLD_READABLE);
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-            //get absolute path
-            String realPath = file.getAbsolutePath();
-            File f = new File(realPath);
-            uri = Uri.fromFile(f);
-
-        } catch (Exception e) {
-            Log.e("Your Error Message", e.getMessage());
-        }
-        return uri;
-    }
 
     //gets the current rotation of the bitmap, rotating it if needed.
     public void exifInterface() {
@@ -240,24 +216,25 @@ public class ImageActivity extends CustomMenu {
                 ExifInterface.ORIENTATION_UNDEFINED);
 
         rotatedBitmap = null;
+        int rotation = 0;
         switch (orientation) {
 
             case ExifInterface.ORIENTATION_ROTATE_90:
-                rotatedBitmap = rotateImage(bitmap, 90);
+                rotation = 90;
                 break;
 
             case ExifInterface.ORIENTATION_ROTATE_180:
-                rotatedBitmap = rotateImage(bitmap, 180);
+                rotation = 180;
                 break;
 
             case ExifInterface.ORIENTATION_ROTATE_270:
-                rotatedBitmap = rotateImage(bitmap, 270);
+                rotation = 270;
                 break;
 
-            case ExifInterface.ORIENTATION_NORMAL:
             default:
                 rotatedBitmap = bitmap;
         }
+        rotatedBitmap = imgHandler.rotateImage(bitmap, rotation);
     }
 
     //Set an receipt as favorite
@@ -268,41 +245,30 @@ public class ImageActivity extends CustomMenu {
             public void onClick(View view) {
                 if (!setFavorite) {
                     favorite.setImageResource(android.R.drawable.star_big_on);
-                    setFavorite = true;
                 } else if (setFavorite) {
                     favorite.setImageResource(android.R.drawable.star_big_off);
-                    setFavorite = false;
                 }
+                setFavorite = !setFavorite;
             }
         });
     }
 
     //Saves the receipe on button save click
-    public void saveReceipt()
-    {
-        final Map<String, Boolean> exists = new HashMap<>();
-        exists.put("exists", true);
+    public void saveReceipt() {
+        String hardcodedCategory = "Electronics";
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final Map<String, Object> information = new HashMap<>();
+        information.put("name", etName.getText());
+        information.put("user", user);
+        information.put("category", hardcodedCategory);
+        information.put("timestamp", mTimestamp);
+        information.put("favorite", setFavorite);
         save.setOnClickListener(new View.OnClickListener() {
 
-            String hardcodedCategory = "Electronics";
-            String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
             @Override
             public void onClick(View view) {
-
-                StorageReference filepath = mStorage.child(currDate);
-                filepath.putFile((bitmapToUriConverter(rotatedBitmap))).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
-                        String storageuid = taskSnapshot.getMetadata().getCreationTimeMillis() + "";
-                        mDatabase.collection("users").document(user).collection("categories").document(hardcodedCategory).collection("fileuids").document(storageuid).set(exists);
-
-                        mDatabase.collection("users").document(user).collection("allFiles").document(storageuid).collection("fileuids").document(mTimestamp).set(exists);
-                        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
-                    }
-                });
-
+                receiptService.saveReceipt(getBaseContext(), rotatedBitmap, information);
             }
         });
     }

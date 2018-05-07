@@ -38,7 +38,6 @@ public class MainActivity extends CustomMenu {
         tvGroupHeader = findViewById(R.id.tvGroupHeader);
 
         Bundle extras = getIntent().getExtras();
-
         currentUserId = extras.getString("USER");
 
         ReceiptService receiptService = new ReceiptService();
@@ -54,6 +53,7 @@ public class MainActivity extends CustomMenu {
 
         createListeners();
 
+        receiptService.getAllCategoriesForUser(user);
     }
 
     private void createListeners() {

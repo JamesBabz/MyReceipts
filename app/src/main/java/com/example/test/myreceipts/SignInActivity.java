@@ -136,6 +136,8 @@ public class SignInActivity extends CustomMenu {
 
                         } else {
                             // If sign in fails, display a message to the user.
+                            btnSignUp.setEnabled(true);
+                            progressBar.setVisibility(View.GONE);
                             Toast.makeText(SignInActivity.this, task.getException().getMessage(),
                                     Toast.LENGTH_LONG).show();
                         }
