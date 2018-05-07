@@ -25,7 +25,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
  * Created by thomas on 23-04-2018.
  */
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends CustomMenu {
 
     private EditText txtUsername;
     private EditText txtFirstname;
@@ -56,25 +56,6 @@ private boolean isThereAnUser = true;
 
         fillOutTextViews();
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_top, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.optSignOut:
-                signOut();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     private void signOut(){

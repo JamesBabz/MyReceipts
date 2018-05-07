@@ -1,4 +1,5 @@
 package com.example.test.myreceipts;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -47,7 +48,7 @@ import butterknife.ButterKnife;
  * Created by Jacob Enemark on 16-04-2018.
  */
 
-public class ImageActivity extends AppCompatActivity {
+public class ImageActivity extends CustomMenu {
 
     private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     String currDate = System.currentTimeMillis() + "";

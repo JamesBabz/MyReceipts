@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends CustomMenu {
 
     Button btnCapture;
     GridView gridView;

@@ -34,7 +34,7 @@ import java.io.IOException;
  * Created by thomas on 16-04-2018.
  */
 
-public class SignInActivity extends AppCompatActivity {
+public class SignInActivity extends CustomMenu {
 
     private static final String TAG = "EmailPassword";
     private UserService userService;
