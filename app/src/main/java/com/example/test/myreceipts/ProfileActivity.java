@@ -58,11 +58,7 @@ private boolean isThereAnUser = true;
 
     }
 
-    private void signOut(){
-        userService.signOut();
-        Intent intent = new Intent(ProfileActivity.this, SignInActivity.class);
-        startActivity(intent);
-    }
+
 
 
     private void fillOutTextViews()
@@ -83,10 +79,7 @@ private boolean isThereAnUser = true;
     }
 
     private void updateUser(){
-        String username = txtUsername.getText().toString();
-        String firstname = txtFirstname.getText().toString();
-        String lastname = txtLastname.getText().toString();
-        User updatedUser = new User(currentUserId, username, firstname, lastname);
+        User updatedUser = new User(currentUserId,txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
       userService.updateUser(updatedUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
           @Override
           public void onComplete(@NonNull Task<DocumentSnapshot> task) {

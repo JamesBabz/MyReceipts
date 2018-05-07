@@ -71,31 +71,5 @@ public class MainActivity extends CustomMenu {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_top, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.optProfile:
-                openProfileView();
-                return true;
-            case R.id.optSignOut:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void openProfileView() {
-        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("USER", currentUserId);
-        startActivity(intent);
-    }
 }

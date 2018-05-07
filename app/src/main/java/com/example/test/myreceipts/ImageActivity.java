@@ -1,9 +1,7 @@
 package com.example.test.myreceipts;
-<<<<<<< HEAD
-import android.app.Activity;
-=======
 
->>>>>>> Development
+import android.app.Activity;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
