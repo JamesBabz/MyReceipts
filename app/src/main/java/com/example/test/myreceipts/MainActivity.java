@@ -59,6 +59,11 @@ public class MainActivity extends CustomMenu {
 
         String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         createListeners();
     }
 
@@ -70,6 +75,7 @@ public class MainActivity extends CustomMenu {
 
     // TODO Move database call to DAO
     private void createOnCategoryRetrievedListener() {
+        categories = new ArrayList<>();
         FirebaseFirestore mStore = FirebaseFirestore.getInstance();
         mStore.collection("users").document(currentUserId).collection("categories")
                 .get()
