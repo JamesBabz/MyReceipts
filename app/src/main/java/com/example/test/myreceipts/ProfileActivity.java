@@ -39,6 +39,10 @@ private boolean isThereAnUser = true;
 
      private UserService userService;
 
+    public ProfileActivity() {
+        super(true, false);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
