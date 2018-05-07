@@ -102,7 +102,10 @@ private boolean isThereAnUser = true;
     }
 
     private void updateUser(){
-        User updatedUser = new User(currentUserId,txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
+        String username = txtUsername.getText().toString();
+        String firstname = txtFirstname.getText().toString();
+        String lastname = txtLastname.getText().toString();
+        User updatedUser = new User(currentUserId, username, firstname, lastname);
       userService.updateUser(updatedUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
           @Override
           public void onComplete(@NonNull Task<DocumentSnapshot> task) {
