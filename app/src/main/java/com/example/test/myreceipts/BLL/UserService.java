@@ -92,10 +92,9 @@ public class UserService {
     }
 
     public void setFavoritesFolder(){
-        Map<String, Integer> map = new HashMap<>();
-
-        map.put("fileId", 0);
-        db.collection("users").document(getCurrentUser().getUid()).collection("categories").document("favorites").collection("fileIds").add(map);
+        Map<String, Boolean> exists = new HashMap<>();
+        exists.put("exists", true);
+        db.collection("users").document(getCurrentUser().getUid()).collection("categories").document("favorites").collection("fileuids").document("0").set(exists);;
     }
 
 }
