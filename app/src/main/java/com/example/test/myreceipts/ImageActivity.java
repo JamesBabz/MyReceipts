@@ -295,70 +295,15 @@ public class ImageActivity extends AppCompatActivity {
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         Toast.makeText(ImageActivity.this, "Upload worked", Toast.LENGTH_LONG);
                         String storageuid = taskSnapshot.getMetadata().getCreationTimeMillis() + "";
-                        mDatabase.collection("users").document(user).collection("categories").document(hardcodedCategory).collection("fileuids").add(storageuid);
-//                                document(storageuid).set(exists);
+                        mDatabase.collection("users").document(user).collection("categories").document(hardcodedCategory).collection("fileuids").document(storageuid).set(exists);
 
                         mDatabase.collection("users").document(user).collection("allFiles").document(storageuid).collection("fileuids").document(mTimestamp).set(exists);
+                        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
                     }
                 });
 
-
-
-
-
-               // CheckForCategoryAndCreate(filepath, user);
-
-
             }
         });
-    }
-
-
-
-
-
-
-    private void CheckForCategoryAndCreate(final StorageReference filepath, final String user) {
-        //Hardcoded category
-        final String hardcodedCategory = "Electronics";
-        final String[] categoryId = new String[1];
-
-        mDatabase.collection("categories").whereEqualTo("name", hardcodedCategory).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                if(queryDocumentSnapshots.isEmpty()){
-                    Map<String, Object> category = new HashMap<>();
-                    category.put("name", hardcodedCategory);
-                    category.put("imagePath","");
-                    Task<DocumentReference> addedCategory = mDatabase.collection("categories").add(category);
-                    addedCategory.addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            categoryId[0] = documentReference.getId();
-                            AddReceipt(filepath, user, categoryId[0]);
-                        }
-                    });
-                }else{
-                    categoryId[0] = queryDocumentSnapshots.getDocuments().get(0).get("name").toString();
-                    AddReceipt(filepath, user, categoryId[0]);
-                }
-            }
-        });
-    }
-
-    private void AddReceipt(StorageReference filepath, String user, String categoryId) {
-        Map<String, Object> receipt = new HashMap<>();
-        receipt.put("UID", user);
-        receipt.put("name", etName.getText().toString());
-        receipt.put("date", mTimestamp);
-        receipt.put("category", categoryId);
-        receipt.put("URL", filepath.toString());
-        receipt.put("isFavorite", setFavorite);
-
-        mDatabase.collection("receipts").add(receipt);
-//        DocumentReference cat = mDatabase.collection("users").document(user).collection("categories").document(categoryId).set(new);
-
-        Toast.makeText(getApplicationContext(), "The receipt is saved correctly", Toast.LENGTH_LONG).show();
     }
 
 }
