@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.ReceiptService;
@@ -24,9 +25,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends CustomMenu {
 
-    Button btnCapture;
+    ImageView btnCapture;
     GridView gridView;
     TextView tvGroupHeader;
 
@@ -89,31 +90,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
 
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_top, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.optProfile:
-                openProfileView();
-                return true;
-            case R.id.optSignOut:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void openProfileView() {
-        Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-        intent.putExtra("USER", currentUserId);
-        startActivity(intent);
-    }
 }

@@ -16,7 +16,7 @@ import com.example.test.myreceipts.BLL.ReceiptService;
  * Created by James on 23-04-2018.
  */
 
-public class ImageGroup extends AppCompatActivity {
+public class ImageGroup extends CustomMenu {
 
     TextView tvGroupName;
     Spinner spinner;

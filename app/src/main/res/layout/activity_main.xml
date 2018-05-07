@@ -107,13 +107,21 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnCapture"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="match_parent"
         android:layout_weight="0"
-        android:text="Take Picture"
-        tools:layout_editor_absoluteX="145dp"
-        tools:layout_editor_absoluteY="409dp" />
+        app:layout_constraintBottom_toBottomOf="@id/gvShowAll"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnCapture"
+            android:layout_width="152dp"
+            android:layout_height="87dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/photo_99135_960_720" />
+    </LinearLayout>
 
 </android.widget.LinearLayout>
