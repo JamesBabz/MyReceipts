@@ -2,18 +2,14 @@ package com.example.test.myreceipts.DAL;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.Entity.Receipt;
-import com.example.test.myreceipts.ImageActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -75,27 +71,6 @@ public class DAO {
 
 
         return returnList;
-    }
-
-
-    public List<String> getAllCategoriesForUser(final String userId) {
-        final List<String> returnList = new ArrayList<>();
-        mStore.collection("users").document(userId).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d("DAO", userId);
-                            Log.d("DAO", document.getId());
-                        }
-//                     returnList.add()
-                    }
-                });
-
-
-
-        return null;
     }
 
     public void saveReceipt(final Context context, Uri uri, final Map<String, Object> information){

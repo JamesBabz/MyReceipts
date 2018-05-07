@@ -42,12 +42,6 @@ public class ImageGroup extends CustomMenu {
 
         ReceiptService receiptService = new ReceiptService();
 
-
-        ivTestImage.setImageBitmap(receiptService.getReceipts().get(0).getBitmap());
-        ivTestImage2.setImageBitmap(receiptService.getReceipts().get(1).getBitmap());
-        ivTestImage3.setImageBitmap(receiptService.getReceipts().get(2).getBitmap());
-
-
         createSpinner();
     }
 
