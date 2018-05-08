@@ -31,8 +31,11 @@ import java.util.UUID;
 
 public class DAO {
 
-    private static final String RECEIPTS_COLLECTION = "receipts";
     private static final String ERROR_TAG = "Error";
+    private static final String USERS_COLLECTION = "users";
+    private static final String CATEGORIES_COLLECTION = "categories";
+    private static final String FILEUIDS_COLLECTION = "fileuids";
+    private static final String ALLFILES_COLLECTION = "allFiles";
 
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
@@ -43,12 +46,11 @@ public class DAO {
 
     }
 
-
     // TODO Not working after DB changes
     public List<Receipt> getAllReceiptsForUser(String UID) {
         List<Receipt> returnList = new ArrayList<>();
 
-        mStore.collection(RECEIPTS_COLLECTION)
+        mStore.collection("receipts")
                 .whereEqualTo("UID", UID)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -91,14 +93,14 @@ public class DAO {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 String storageuid = uuid.toString();
                 // Reference to document
-                DocumentReference catDocRef = mStore.collection("users")
+                DocumentReference catDocRef = mStore.collection(USERS_COLLECTION)
                         .document(information.get("user").toString())
-                        .collection("categories")
+                        .collection(CATEGORIES_COLLECTION)
                         .document(information.get("category").toString().toLowerCase());
                 // Create fieid so it later can be accessed
                 catDocRef.set(exists);
 
-                catDocRef.collection("fileuids")
+                catDocRef.collection(FILEUIDS_COLLECTION)
                         .document(storageuid)
                         .set(exists);
 
@@ -106,23 +108,23 @@ public class DAO {
                 timeMap.put("timestamp", information.get("timestamp"));
 
                 // Reference to document
-                DocumentReference allFileDocRef = mStore.collection("users")
+                DocumentReference allFileDocRef = mStore.collection(USERS_COLLECTION)
                         .document(information.get("user").toString())
-                        .collection("allFiles")
+                        .collection(ALLFILES_COLLECTION)
                         .document(storageuid);
 
                 // Create fieid so it later can be accessed
                 allFileDocRef.set(exists);
 
-                allFileDocRef.collection("fileuids")
+                allFileDocRef.collection(FILEUIDS_COLLECTION)
                         .add(timeMap);
 
                 if (information.get("favorite").equals(true)) {
-                    mStore.collection("users")
+                    mStore.collection(USERS_COLLECTION)
                             .document(information.get("user").toString())
-                            .collection("categories")
+                            .collection(CATEGORIES_COLLECTION)
                             .document("favorite")
-                            .collection("fileuids")
+                            .collection(FILEUIDS_COLLECTION)
                             .document(storageuid)
                             .set(exists);
                 }
