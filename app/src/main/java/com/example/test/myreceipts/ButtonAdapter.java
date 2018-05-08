@@ -3,7 +3,6 @@ package com.example.test.myreceipts;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,18 +18,18 @@ import java.util.List;
 
 public class ButtonAdapter extends BaseAdapter {
     private Context mContext;
-    private List<String> groupNames = new ArrayList<String>();
+    private List<String> categoryNames = new ArrayList<String>();
 
 
     // Gets the context so it can be used later
-    public ButtonAdapter(Context c, List<String> groupNames) {
+    public ButtonAdapter(Context c, List<String> categoryNames) {
         mContext = c;
-        this.groupNames = groupNames;
+        this.categoryNames = categoryNames;
     }
 
     // Total number of things contained within the adapter
     public int getCount() {
-        return groupNames.size();
+        return categoryNames.size();
     }
 
     // Require for structure, not really used in my code.
@@ -58,7 +57,7 @@ public class ButtonAdapter extends BaseAdapter {
             btn = (Button) convertView;
         }
 
-        btn.setText(groupNames.get(position));
+        btn.setText(categoryNames.get(position));
         // filenames is an array of strings
         btn.setTextColor(Color.WHITE);
         btn.setBackgroundColor(Color.DKGRAY);
@@ -67,10 +66,8 @@ public class ButtonAdapter extends BaseAdapter {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext,"HEJEHEJEHEJHEJE", Toast.LENGTH_LONG);
-//                Log.i("test", "text");
-                Intent intent = new Intent(mContext, ImageGroup.class);
-                intent.putExtra("groupName", groupNames.get(position));
+                Intent intent = new Intent(mContext, CategoryActivity.class);
+                intent.putExtra("categoryName", categoryNames.get(position));
                 mContext.startActivity(intent);
             }
         });
