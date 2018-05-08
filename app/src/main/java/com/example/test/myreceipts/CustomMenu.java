@@ -116,7 +116,7 @@ public class CustomMenu extends AppCompatActivity {
                 //creates exist field
                 Map<String, Boolean> exists = new HashMap<>();
                 exists.put("exists", true);
-                db.collection("users").document(getCurrentUser().getUid()).collection("categories").document(m_Text).set(exists);
+                db.collection("users").document(getCurrentUser().getUid()).collection("categories").document(m_Text.toLowerCase()).set(exists);
 
                 //Refresh page for new categories
                 Intent intent = getIntent();
