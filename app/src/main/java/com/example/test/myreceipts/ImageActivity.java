@@ -1,57 +1,42 @@
 package com.example.test.myreceipts;
 
-import android.app.Activity;
-
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
-import com.example.test.myreceipts.Entity.Receipt;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-import java.util.UUID;
 
 /**
  * Created by Jacob Enemark on 16-04-2018.
@@ -66,6 +51,7 @@ public class ImageActivity extends CustomMenu {
     Bitmap rotatedBitmap;
     File mFile;
     Uri uriSavedImage;
+    List<String> categories = new ArrayList<>();
 
     private String mTimestamp;
     private ImageHandler imgHandler;
@@ -77,14 +63,14 @@ public class ImageActivity extends CustomMenu {
     TextView date;
     @BindView(R.id.ivPicture)
     ImageView ivPicture;
-    @BindView(R.id.tvCategory)
-    TextView category;
     @BindView(R.id.favorite)
     ImageButton favorite;
     @BindView(R.id.btnSave)
     TextView save;
     @BindView(R.id.etName)
     TextView etName;
+    @BindView(R.id.spinner)
+    Spinner spinner;
 
     public ImageActivity() {
         super(true, true);
@@ -99,20 +85,20 @@ public class ImageActivity extends CustomMenu {
         ButterKnife.bind(this);
 
         date.setText("Date:");
-        category.setText("Category:");
 
         receiptService = new ReceiptService();
 
-        listeners();
+        createListeners();
         mTimestamp = getTimeStamp();
         imgHandler = new ImageHandler();
     }
 
     //Listeners to avoid having them all in onCreate
-    public void listeners() {
+    public void createListeners() {
         takePicture();
         isSetFavorite();
         saveReceipt();
+        createOnCategoryRetrievedListener();
     }
 
     //Creates or check if there is a folder for pictures
@@ -186,7 +172,6 @@ public class ImageActivity extends CustomMenu {
                 exifInterface();
 
                 date.setText("Date: " + mTimestamp);
-                category.setText("Category: Electronics");
 
                 ivPicture.setImageURI(imgHandler.bitmapToUriConverter(getBaseContext(), rotatedBitmap));
 
@@ -257,24 +242,52 @@ public class ImageActivity extends CustomMenu {
 
     //Saves the receipe on button save click
     public void saveReceipt() {
-        String hardcodedCategory = "Electronics";
-        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        final String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
         final Map<String, Object> information = new HashMap<>();
-        information.put("name", etName.getText());
-        information.put("user", user);
-        information.put("category", hardcodedCategory);
-        information.put("timestamp", mTimestamp);
-        information.put("favorite", setFavorite);
+
         save.setOnClickListener(new View.OnClickListener() {
 
 
             @Override
             public void onClick(View view) {
+                information.put("name", etName.getText());
+                information.put("user", user);
+                information.put("category", spinner.getSelectedItem().toString().toLowerCase());
+                information.put("timestamp", mTimestamp);
+                information.put("favorite", setFavorite);
                 receiptService.saveReceipt(getBaseContext(), rotatedBitmap, information);
             }
         });
     }
 
+    // TODO Move database call to DAO. Duplicated code in MainActivity
+    private void createOnCategoryRetrievedListener() {
+        categories = new ArrayList<>();
+        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
+        mStore.collection("users").document(user).collection("categories")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String cat = document.getId();
+                            if (!cat.equals("favorites")) {
+                                cat = cat.substring(0, 1).toUpperCase() + cat.substring(1);
+                                categories.add(cat);
+                            }
+                        }
+                        createSpinner();
+                    }
+                });
+
+    }
+
+    private void createSpinner() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
 }
 
 

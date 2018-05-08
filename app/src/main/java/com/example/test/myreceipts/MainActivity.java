@@ -73,7 +73,7 @@ public class MainActivity extends CustomMenu {
     }
 
 
-    // TODO Move database call to DAO
+    // TODO Move database call to DAO. Duplicated code in ImageActivity
     private void createOnCategoryRetrievedListener() {
         categories = new ArrayList<>();
         FirebaseFirestore mStore = FirebaseFirestore.getInstance();
