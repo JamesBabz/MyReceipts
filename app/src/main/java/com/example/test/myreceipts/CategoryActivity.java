@@ -1,23 +1,19 @@
 package com.example.test.myreceipts;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.test.myreceipts.BLL.ReceiptService;
 
 /**
- * Created by James on 23-04-2018.
+ * Created by James on 08-05-2018.
  */
 
-public class ImageGroup extends CustomMenu {
-
+public class CategoryActivity extends CustomMenu {
     TextView tvGroupName;
     Spinner spinner;
     ScrollView svContainer;
@@ -25,26 +21,25 @@ public class ImageGroup extends CustomMenu {
     ImageView ivTestImage2;
     ImageView ivTestImage3;
 
-    public ImageGroup() {
+    public CategoryActivity() {
         super(true, true);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_group);
+        setContentView(R.layout.category_activity);
         tvGroupName = findViewById(R.id.tvGroupName);
         svContainer = findViewById(R.id.svContainer);
         ivTestImage = findViewById(R.id.ivTestImage);
         ivTestImage2 = findViewById(R.id.ivTestImage2);
         ivTestImage3 = findViewById(R.id.ivTestImage3);
-        tvGroupName.setText(getIntent().getExtras().getString("groupName"));
+        tvGroupName.setText(getIntent().getExtras().getString("categoryName"));
 
         ReceiptService receiptService = new ReceiptService();
 
         createSpinner();
     }
-
 
 
     private void createSpinner() {
