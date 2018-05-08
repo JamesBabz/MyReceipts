@@ -5,11 +5,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by James on 07-05-2018.
@@ -52,4 +55,5 @@ public class ImageHandler {
         }
         return uri;
     }
+
 }

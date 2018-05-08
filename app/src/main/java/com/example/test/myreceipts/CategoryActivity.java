@@ -1,25 +1,57 @@
 package com.example.test.myreceipts;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.example.test.myreceipts.BLL.Callback;
 import com.example.test.myreceipts.BLL.ReceiptService;
+import com.example.test.myreceipts.BLL.UserService;
+import com.example.test.myreceipts.Entity.Receipt;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by James on 08-05-2018.
  */
 
 public class CategoryActivity extends CustomMenu {
-    TextView tvGroupName;
+    ReceiptService receiptService;
+    UserService userService;
     Spinner spinner;
-    ScrollView svContainer;
-    ImageView ivTestImage;
-    ImageView ivTestImage2;
-    ImageView ivTestImage3;
+    ListView listViewCategories;
+    ListAdapter listAdapter;
+    List<Receipt> allReceipts;
+     List<Receipt> returnList = new ArrayList<>();
+    private FirebaseFirestore mStore;
+    private StorageReference mStorage;
 
     public CategoryActivity() {
         super(true, true);
@@ -29,15 +61,17 @@ public class CategoryActivity extends CustomMenu {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.category_activity);
-        tvGroupName = findViewById(R.id.tvGroupName);
-        svContainer = findViewById(R.id.svContainer);
-        ivTestImage = findViewById(R.id.ivTestImage);
-        ivTestImage2 = findViewById(R.id.ivTestImage2);
-        ivTestImage3 = findViewById(R.id.ivTestImage3);
-        tvGroupName.setText(getIntent().getExtras().getString("categoryName"));
+        listViewCategories = findViewById(R.id.listViewCategories);
 
-        ReceiptService receiptService = new ReceiptService();
+        receiptService = new ReceiptService();
+        userService = new UserService();
+        mStore = FirebaseFirestore.getInstance();
+        mStorage = FirebaseStorage.getInstance().getReference();
+        listViewCategories = findViewById(R.id.listViewCategories);
+        String userUid = userService.getCurrentUser().getUid();
+       // allReceipts = receiptService.getReceipts(userUid, getIntent().getExtras().getString("categoryName"));
 
+        getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
         createSpinner();
     }
 
@@ -49,4 +83,132 @@ public class CategoryActivity extends CustomMenu {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
+
+
+    public void getAllReceiptsForCategory(final String userUid, final String category) {
+
+        mStore.document("users/" + userUid).collection("categories").document(category).collection("fileuids").get() .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<String> test = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        test.add(document.getId());
+                    }
+
+                    getFilesFromStorage(userUid, test);
+                } else {
+                    Log.w("shiat", "Error getting documents.", task.getException());
+                }
+            }
+        });
+
+    }
+
+    private void getFilesFromStorage(String userUid, List<String> fileuids){
+        for (String fileuid:fileuids) {
+
+            final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid );
+
+            storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                @Override
+                public void onSuccess(StorageMetadata storageMetadata) {
+                    final String fileName = storageMetadata.getCustomMetadata("name");
+                    Log.d("fileMetadata", fileName);
+                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Receipt rec = new Receipt();
+                            rec.setName(fileName);
+                            rec.setURL(uri);
+                            rec.setBitmap(returnbit(uri));
+                            returnList.add(rec);
+
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle any errors
+                        }
+                    });
+
+                }
+            });
+        }
+    }
+
+    private Bitmap returnbit(Uri uri){
+        Bitmap bitmap = null;
+        try {
+           bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    public void shit(View v){
+        listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
+        listViewCategories.setAdapter(listAdapter);
+    }
+
+}
+
+
+class ListAdapter extends ArrayAdapter<Receipt> {
+
+    private List<Receipt> receipts;
+    Context context;
+    ReceiptService receiptService;
+
+    // Array of colors to set in listView
+    private final int[] colors = {
+            Color.parseColor("#ffffff"),
+            Color.parseColor("#b3cbf2")
+    };
+
+    public ListAdapter(Context context, int textViewResourceId,
+                       List<Receipt> receipts) {
+        super(context, textViewResourceId, receipts);
+        this.receipts = receipts;
+        this.context = context;
+        receiptService = new ReceiptService();
+    }
+
+
+    @Override
+    public View getView(int position, View v, ViewGroup parent) {
+
+        if (v == null) {
+            LayoutInflater li = (LayoutInflater) getContext().getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+
+            v = li.inflate(R.layout.cell_extended, parent,false);
+        }
+
+        v.setBackgroundColor(colors[position % colors.length]);
+
+
+
+
+        Receipt receipt = receipts.get(position);
+
+        TextView name = v.findViewById(R.id.twReceiptName);
+        TextView date = v.findViewById(R.id.twReceiptDate);
+        ImageView receiptImg = v.findViewById(R.id.imageViewReceipt);
+
+        name.setText(receipt.getName());
+        date.setText(receipt.getDate());
+        receiptImg.setImageBitmap(receipt.getBitmap());
+
+
+
+        return v;
+    }
+
+
 }

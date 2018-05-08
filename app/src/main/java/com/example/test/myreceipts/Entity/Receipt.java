@@ -1,6 +1,7 @@
 package com.example.test.myreceipts.Entity;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import com.google.firebase.storage.StorageReference;
 
@@ -15,7 +16,7 @@ public class Receipt {
     String Category;
     String Date;
     Boolean IsFavorite;
-    String URL;
+    Uri URL;
 
     public Receipt() {
     }
@@ -52,11 +53,11 @@ public class Receipt {
         IsFavorite = favorite;
     }
 
-    public String getURL() {
+    public Uri getURL() {
         return URL;
     }
 
-    public void setURL(String URL) {
+    public void setURL(Uri URL) {
         this.URL = URL;
     }
 
