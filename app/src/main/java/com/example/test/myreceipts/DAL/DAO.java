@@ -79,7 +79,7 @@ public class DAO {
     public void saveReceipt(final Context context, Uri uri, final Map<String, Object> information) {
         // Generates a random uid
         final UUID uuid = UUID.randomUUID();
-        StorageReference filepath = mStorage.child("receipts/" + information.get("name").toString());
+        StorageReference filepath = mStorage.child("receipts/").child(information.get("user") +"/" + information.get("name").toString());
 
         final HashMap<String, Boolean> exists = new HashMap<>();
         exists.put("exists", true);
