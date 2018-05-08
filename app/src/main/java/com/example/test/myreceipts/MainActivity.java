@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.ReceiptService;
@@ -26,15 +27,24 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends CustomMenu {
 
     ImageView btnCapture;
     GridView gridView;
     TextView tvGroupHeader;
 
+    Boolean categoryProgress;
+
     private String currentUserId;
 
     List<String> categories = new ArrayList<>();
+
+
+    @BindView(R.id.categoryRefresh)
+    ProgressBar mProgressBar;
 
     public MainActivity() {
         super(false, true);
@@ -48,6 +58,7 @@ public class MainActivity extends CustomMenu {
         gridView = findViewById(R.id.gvShowAll);
         btnCapture = findViewById(R.id.btnCapture);
         tvGroupHeader = findViewById(R.id.tvGroupHeader);
+        ButterKnife.bind(this);
 
         Bundle extras = getIntent().getExtras();
         currentUserId = extras.getString("USER");
@@ -57,7 +68,10 @@ public class MainActivity extends CustomMenu {
         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
         gridView.setAdapter(buttonAdapter);
 
+        mProgressBar.setVisibility(View.INVISIBLE);
+
         String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
     }
 
@@ -75,6 +89,7 @@ public class MainActivity extends CustomMenu {
 
     // TODO Move database call to DAO. Duplicated code in ImageActivity
     private void createOnCategoryRetrievedListener() {
+        categoryProgressBar();
         categories = new ArrayList<>();
         FirebaseFirestore mStore = FirebaseFirestore.getInstance();
         mStore.collection("users").document(currentUserId).collection("categories")
@@ -92,9 +107,21 @@ public class MainActivity extends CustomMenu {
 
                         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
                         gridView.setAdapter(buttonAdapter);
+
+                        categoryProgressBar();
                     }
                 });
 
+
+    }
+
+    private void categoryProgressBar() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                setCategoryProgress();
+            }
+        });
     }
 
     private void createCaptureButtonListener() {
@@ -126,5 +153,16 @@ public class MainActivity extends CustomMenu {
         setIntent.addCategory(Intent.CATEGORY_HOME);
         setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(setIntent);
+    }
+
+    private void setCategoryProgress() {
+        if (mProgressBar.getVisibility() == View.INVISIBLE)
+        {
+            mProgressBar.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 }
