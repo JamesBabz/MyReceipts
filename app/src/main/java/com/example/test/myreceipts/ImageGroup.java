@@ -25,6 +25,10 @@ public class ImageGroup extends CustomMenu {
     ImageView ivTestImage2;
     ImageView ivTestImage3;
 
+    public ImageGroup() {
+        super(true, true);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,12 +41,6 @@ public class ImageGroup extends CustomMenu {
         tvGroupName.setText(getIntent().getExtras().getString("groupName"));
 
         ReceiptService receiptService = new ReceiptService();
-
-
-        ivTestImage.setImageBitmap(receiptService.getReceipts().get(0).getBitmap());
-        ivTestImage2.setImageBitmap(receiptService.getReceipts().get(1).getBitmap());
-        ivTestImage3.setImageBitmap(receiptService.getReceipts().get(2).getBitmap());
-
 
         createSpinner();
     }

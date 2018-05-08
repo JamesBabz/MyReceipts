@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,12 +15,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.User;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -27,14 +24,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 
-import java.io.IOException;
-
-
 /**
  * Created by thomas on 16-04-2018.
  */
 
-public class SignInActivity extends CustomMenu {
+public class SignInActivity extends AppCompatActivity {
 
     private static final String TAG = "EmailPassword";
     private UserService userService;
@@ -48,7 +42,6 @@ public class SignInActivity extends CustomMenu {
     ProgressBar progressBar;
 
     private FirebaseAuth firebaseAuth;
-    private GoogleSignInClient mGoogleSignInClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,22 +60,11 @@ public class SignInActivity extends CustomMenu {
 
         userService = new UserService();
 
-        // [START config_signin]
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        // [END config_signin]
-
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
         // [START initialize_auth]
         firebaseAuth = FirebaseAuth.getInstance();
         // [END initialize_auth]
 
     }
-
 
     // [START on_start_check_user]
     @Override
@@ -97,9 +79,6 @@ public class SignInActivity extends CustomMenu {
         } catch (@NonNull Exception exception) {
             Log.d("UserLogin", "fail");
         }
-
-
-
     }
     // [END on_start_check_user]
 
@@ -108,6 +87,7 @@ public class SignInActivity extends CustomMenu {
         createAccount(email, mPasswordField.getText().toString());
     }
     private void createAccount(String email, String password) {
+        // if the validator is not true, it will do nothing
         if (!validateForm())
         {
             return;
@@ -121,13 +101,15 @@ public class SignInActivity extends CustomMenu {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
+                            // Sign in success, create an user for the account, and start new activity.
                             FirebaseUser user = userService.getCurrentUser();
+                            //create a new user to make the update
                             User newUser = new User(user.getUid(),user.getEmail(), "", "");
-
+                            // creates the user in database
                             userService.updateUser(newUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    //if success it generate a new folder for the user. 'favorites*. The user will then always gets this folder, which is needed
                                     userService.setFavoritesFolder();
                                 }
                             }));
@@ -152,7 +134,7 @@ public class SignInActivity extends CustomMenu {
 
     }
     private void signIn(String email, String password) {
-
+        // if the validator is not true, it will do nothing
         if (!validateForm())
         {
             return;
@@ -175,10 +157,8 @@ public class SignInActivity extends CustomMenu {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_LONG).show();
-                        }
-
-                        // [START_EXCLUDE]
-                        if (!task.isSuccessful()) {
+                            btnSignIn.setEnabled(true);
+                            progressBar.setVisibility(View.GONE);
                         }
                     }
                 });
@@ -186,9 +166,7 @@ public class SignInActivity extends CustomMenu {
     }
 
 
-
-
-
+    // Validate the textfields. If one og both are empty, the field will set the error message.
     private boolean validateForm() {
         boolean valid = true;
 
@@ -253,5 +231,25 @@ public class SignInActivity extends CustomMenu {
         headLine.setText("Sign in");
         mPasswordField.setText("");
         mEmailField.setText("");
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Intent setIntent = new Intent(Intent.ACTION_MAIN);
+        setIntent.addCategory(Intent.CATEGORY_HOME);
+        setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(setIntent);
     }
 }
