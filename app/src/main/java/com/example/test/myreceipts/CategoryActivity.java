@@ -2,9 +2,11 @@ package com.example.test.myreceipts;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -35,6 +37,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +58,7 @@ public class CategoryActivity extends CustomMenu {
      List<Receipt> returnList = new ArrayList<>();
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
+    Bitmap bitmap;
 
     public CategoryActivity() {
         super(true, true);
@@ -73,6 +80,10 @@ public class CategoryActivity extends CustomMenu {
 
         getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
         createSpinner();
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+        StrictMode.setThreadPolicy(policy);
     }
 
 
@@ -106,6 +117,7 @@ public class CategoryActivity extends CustomMenu {
     }
 
     private void getFilesFromStorage(String userUid, List<String> fileuids){
+
         for (String fileuid:fileuids) {
 
             final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid );
@@ -121,7 +133,11 @@ public class CategoryActivity extends CustomMenu {
                             Receipt rec = new Receipt();
                             rec.setName(fileName);
                             rec.setURL(uri);
-                            rec.setBitmap(returnbit(uri));
+
+                           // rec.setBitmap(returnbit(uri));
+
+
+
                             returnList.add(rec);
 
 
@@ -138,7 +154,8 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    private Bitmap returnbit(Uri uri){
+
+  /*  private Bitmap returnbit(Uri uri){
         Bitmap bitmap = null;
         try {
            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
@@ -149,7 +166,7 @@ public class CategoryActivity extends CustomMenu {
         }
 
         return bitmap;
-    }
+    }*/
 
     public void shit(View v){
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
@@ -195,20 +212,59 @@ class ListAdapter extends ArrayAdapter<Receipt> {
 
 
 
-        Receipt receipt = receipts.get(position);
+        final Receipt receipt = receipts.get(position);
 
         TextView name = v.findViewById(R.id.twReceiptName);
         TextView date = v.findViewById(R.id.twReceiptDate);
-        ImageView receiptImg = v.findViewById(R.id.imageViewReceipt);
+        final ImageView receiptImg = v.findViewById(R.id.imageViewReceipt);
 
         name.setText(receipt.getName());
         date.setText(receipt.getDate());
-        receiptImg.setImageBitmap(receipt.getBitmap());
+       // receiptImg.setImageBitmap(receipt.getBitmap());
 
 
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    loadImageFromURL(receipt, receiptImg);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
 
         return v;
     }
 
+    private void loadImageFromURL(Receipt receipt, ImageView receiptImg) {
+        loadImageFromURL(receipt.getURL().toString(), receiptImg);
+    }
 
+    public boolean loadImageFromURL(String fileUrl,
+                                    ImageView iv){
+        try {
+
+            URL myFileUrl = new URL (fileUrl);
+            HttpURLConnection conn =
+                    (HttpURLConnection) myFileUrl.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+
+            InputStream is = conn.getInputStream();
+            iv.setImageBitmap(BitmapFactory.decodeStream(is));
+
+            return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
