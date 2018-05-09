@@ -81,9 +81,7 @@ public class CategoryActivity extends CustomMenu {
         getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
         createSpinner();
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
-        StrictMode.setThreadPolicy(policy);
     }
 
 
