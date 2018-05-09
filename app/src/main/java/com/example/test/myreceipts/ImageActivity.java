@@ -85,7 +85,6 @@ public class ImageActivity extends CustomMenu {
         ButterKnife.bind(this);
 
         date.setText("Date:");
-
         receiptService = new ReceiptService();
 
         createListeners();
