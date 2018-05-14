@@ -115,7 +115,7 @@ public class DAO {
         mStore.collection(USERS_COLLECTION)
                 .document(information.get("user").toString())
                 .collection(CATEGORIES_COLLECTION)
-                .document("favorite")
+                .document("favorites")
                 .collection(FILEUIDS_COLLECTION)
                 .document(storageuid)
                 .set(exists);
