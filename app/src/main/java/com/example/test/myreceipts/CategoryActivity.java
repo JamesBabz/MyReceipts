@@ -240,7 +240,6 @@ class ListAdapter extends ArrayAdapter<Receipt> {
         date.setText(receipt.getDate());
        // receiptImg.setImageBitmap(receipt.getBitmap());
 
-
         Thread thread = new Thread(new Runnable() {
 
             @Override
