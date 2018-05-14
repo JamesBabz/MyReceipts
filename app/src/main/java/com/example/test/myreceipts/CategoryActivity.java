@@ -38,11 +38,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-<<<<<<< HEAD
-import java.io.Console;
-=======
-import java.io.BufferedInputStream;
->>>>>>> Development
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -131,12 +126,9 @@ public class CategoryActivity extends CustomMenu {
     //Gets the image from firebase storage with the file uid and user uid
     private void getFilesFromStorage(String userUid, List<String> fileuids) {
 
-<<<<<<< HEAD
-        for (final String fileuid:fileuids) {
-=======
+
         //for all file uids in the list, it wil:
-        for (String fileuid : fileuids) {
->>>>>>> Development
+        for (final String fileuid : fileuids) {
 
             // gets the reference to the single file in storage, in the user's folder in storage
             final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid);
@@ -153,7 +145,6 @@ public class CategoryActivity extends CustomMenu {
                         public void onSuccess(final Uri uri) {
                             final Receipt rec = new Receipt();
                             rec.setName(fileName);
-<<<<<<< HEAD
                             rec.setURL(uri.toString());
                             rec.setId(fileuid);
 
@@ -168,7 +159,6 @@ public class CategoryActivity extends CustomMenu {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             // Handle any errors
-=======
 
                             //TODO not a good solution, how to refactor this?!
                             Thread thread = new Thread(new Runnable() {
@@ -185,7 +175,6 @@ public class CategoryActivity extends CustomMenu {
                             thread.start();
                             listAdapter.notifyDataSetChanged(); // notify the list list about changes
                             returnList.add(rec); // the arrayList for the ListAdapter, to set the list
->>>>>>> Development
                         }
                     });
                 }
@@ -217,10 +206,7 @@ public class CategoryActivity extends CustomMenu {
 
         Intent intent = new Intent(this, ReceiptActivity.class);
         intent.putExtra("RECEIPT", entry);
-<<<<<<< HEAD
         Log.d("HELLO", entry.getName());
-=======
->>>>>>> Development
         startActivity(intent);
     }
 
