@@ -11,10 +11,12 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.example.test.myreceipts.ButtonAdapter;
+import com.example.test.myreceipts.DAL.DAO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -30,7 +32,9 @@ import java.util.Map;
 
 public class CategoryService {
 
+    private final CollectionReference catRef;
     private FirebaseFirestore db;
+    private DAO dao;
     private FirebaseAuth fAuth;
     private String user;
 
@@ -38,13 +42,27 @@ public class CategoryService {
         db = FirebaseFirestore.getInstance();
         fAuth = FirebaseAuth.getInstance();
         user = fAuth.getCurrentUser().getUid();
+        catRef = db.collection("users").document(user).collection("categories");
+        dao = new DAO();
     }
 
+    /**
+     * Create a new category
+     * @param catName - Name of the category to add
+     */
     public void createCategory(String catName) {
         //creates exist field
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("exists", true);
-        db.collection("users").document(user).collection("categories").document(catName.toLowerCase()).set(exists);
+        catRef.document(catName.toLowerCase()).set(exists);
+    }
+
+    /**
+     * Delete a category by name
+     * @param catName - The name of the category
+     */
+    public void deleteCategory(String catName){
+        dao.deleteCategory(catName);
     }
 
     /**
