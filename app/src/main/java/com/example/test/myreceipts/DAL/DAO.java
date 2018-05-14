@@ -45,6 +45,7 @@ public class DAO {
     private StorageReference mStorage;
     List<Receipt> returnList = new ArrayList<>();
     List<Receipt> test = new ArrayList<>();
+
     public DAO() {
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -84,7 +85,7 @@ public class DAO {
     public void saveReceipt(final Context context, Uri uri, final Map<String, Object> information) {
         // Generates a random uid
         final UUID uuid = UUID.randomUUID();
-        StorageReference filepath = mStorage.child("receipts/").child(information.get("user") +"/" + uuid.toString());
+        StorageReference filepath = mStorage.child("receipts/").child(information.get("user") + "/" + uuid.toString());
 
         final HashMap<String, Boolean> exists = new HashMap<>();
         exists.put("exists", true);

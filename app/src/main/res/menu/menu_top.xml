@@ -20,7 +20,9 @@
         app:showAsAction="never"
 
         />
-
+    <item
+        android:id="@+id/optDeleteCategory"
+        android:title="Delete Category" />
 
 
 </menu>

@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ReceiptService;
 import com.example.test.myreceipts.Entity.Receipt;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,12 +43,14 @@ public class MainActivity extends CustomMenu {
 
     List<String> categories = new ArrayList<>();
 
+    private CategoryService categoryService;
 
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
 
     public MainActivity() {
         super(false, true);
+        categoryService = new CategoryService();
     }
 
 
@@ -86,33 +89,9 @@ public class MainActivity extends CustomMenu {
         createOnCategoryRetrievedListener();
     }
 
-
-    // TODO Move database call to DAO. Duplicated code in ImageActivity and CustomMenu
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
-        categories = new ArrayList<>();
-        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-        mStore.collection("users").document(currentUserId).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            if (document.getId().equals("favorites")) {
-                                categories.add(0, document.getId());
-                            } else {
-                                categories.add(document.getId());
-                            }
-                        }
-
-                        ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
-                        gridView.setAdapter(buttonAdapter);
-
-                        categoryProgressBar();
-                    }
-                });
-
-
+        categoryService.addCategoriesToButtonAdapter(this, gridView, mProgressBar);
     }
 
     private void categoryProgressBar() {
@@ -136,7 +115,7 @@ public class MainActivity extends CustomMenu {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {
@@ -156,12 +135,9 @@ public class MainActivity extends CustomMenu {
     }
 
     private void setCategoryProgress() {
-        if (mProgressBar.getVisibility() == View.INVISIBLE)
-        {
+        if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
-        }
-        else
-        {
+        } else {
             mProgressBar.setVisibility(View.GONE);
         }
     }
