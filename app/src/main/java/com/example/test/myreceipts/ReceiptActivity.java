@@ -20,7 +20,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -106,8 +105,6 @@ public class ReceiptActivity extends CustomMenu {
                     }
                 });
 
-                if (receipt.getFavorite())
-                {
                     db.collection("users").document(mUserService.getCurrentUser().getUid()).collection("categories").document("favorites").collection("fileuids").document(receipt.getId())
                             .delete()
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -122,7 +119,7 @@ public class ReceiptActivity extends CustomMenu {
                                     Log.w("HELLO", "Error deleting document", e);
                                 }
                             });
-                }
+
 
                 Toast toast = Toast.makeText(ReceiptActivity.this, "You deleted the receipt", Toast.LENGTH_LONG);
                 toast.show();

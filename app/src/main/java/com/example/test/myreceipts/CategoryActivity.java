@@ -89,8 +89,6 @@ public class CategoryActivity extends CustomMenu {
     @Override
     protected void onResume() {
         super.onResume();
-
-
         createSpinner();
 
         addListenerOnList();
