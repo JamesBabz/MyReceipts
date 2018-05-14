@@ -11,10 +11,12 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.example.test.myreceipts.ButtonAdapter;
+import com.example.test.myreceipts.DAL.DAO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -30,25 +32,44 @@ import java.util.Map;
 
 public class CategoryService {
 
+    private final CollectionReference catRef;
     private FirebaseFirestore db;
+    private DAO dao;
     private FirebaseAuth fAuth;
+    private String user;
 
     public CategoryService() {
         db = FirebaseFirestore.getInstance();
         fAuth = FirebaseAuth.getInstance();
+        user = fAuth.getCurrentUser().getUid();
+        catRef = db.collection("users").document(user).collection("categories");
+        dao = new DAO();
     }
 
+    /**
+     * Create a new category
+     * @param catName - Name of the category to add
+     */
     public void createCategory(String catName) {
         //creates exist field
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("exists", true);
-        db.collection("users").document(getCurrentUser().getUid()).collection("categories").document(catName.toLowerCase()).set(exists);
+        catRef.document(catName.toLowerCase()).set(exists);
+    }
+
+    /**
+     * Delete a category by name
+     * @param catName - The name of the category
+     */
+    public void deleteCategory(String catName){
+        dao.deleteCategory(catName);
     }
 
     /**
      * The method to call if you want to add the categories to a spinner
-     * @param spinner - The spinner to populate with the categories
-     * @param showFavorites - Should the "favorites" category be shown?
+     *
+     * @param spinner        - The spinner to populate with the categories
+     * @param showFavorites  - Should the "favorites" category be shown?
      * @param showUnassigned - Should the "unassigned" category be shown?
      */
     public void addCategoriesToSpinner(Spinner spinner, boolean showFavorites, boolean showUnassigned) {
@@ -61,7 +82,8 @@ public class CategoryService {
 
     /**
      * The method to call if you want to add the categories to a button adapter
-     * @param gridView - The gridview where the buttons should be inserted into
+     *
+     * @param gridView     - The gridview where the buttons should be inserted into
      * @param mProgressBar - A ProgressBar to show incase it takes too long to get the categories
      */
     public void addCategoriesToButtonAdapter(GridView gridView, ProgressBar mProgressBar) {
@@ -73,11 +95,11 @@ public class CategoryService {
 
     /**
      * The private method to handle all category calls from the outside
-     * @param parameters - Whatever parameters have been supplied from previous methods
+     *
+     * @param parameters  - Whatever parameters have been supplied from previous methods
      * @param requestedBy - The identifier of which method called this method
      */
     private void handleGetCategories(final HashMap<String, Object> parameters, final String requestedBy) {
-        String user = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Gets the userUid for reference to the database
         FirebaseFirestore mStore = FirebaseFirestore.getInstance(); // the database
         //We create a new list to hold the categories
         final List<String> categories = new ArrayList<>();
@@ -104,7 +126,8 @@ public class CategoryService {
 
     /**
      * The private task method that will be called when we want categories for the button adapter
-     * @param task - The task being run when categories have been gotten from the database
+     *
+     * @param task       - The task being run when categories have been gotten from the database
      * @param parameters - The paramaters from "addCategoriesToButtonAdapter" with the category added
      */
     private void createButtonAdapterTask(@NonNull Task<QuerySnapshot> task, HashMap<String, Object> parameters) {
@@ -135,7 +158,8 @@ public class CategoryService {
 
     /**
      * The private task method that will be called when we want categories for the spinner
-     * @param task - The task being run when categories have been gotten from the database
+     *
+     * @param task       - The task being run when categories have been gotten from the database
      * @param parameters - The paramaters from "addCategoriesToSpinner" with the category added
      */
     private void createSpinnerTask(@NonNull Task<QuerySnapshot> task, HashMap<String, Object> parameters) {
@@ -164,18 +188,14 @@ public class CategoryService {
     }
 
     /**
+     * Creates the spinner with custom array adapter
      *
-     * @param spinner
-     * @param categories
+     * @param spinner    - The spinner to be created
+     * @param categories - The items for the spinner
      */
     private void createSpinner(Spinner spinner, List<String> categories) {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(spinner.getContext(), android.R.layout.simple_spinner_item, categories);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
     }
-
-    public FirebaseUser getCurrentUser() {
-        return fAuth.getCurrentUser();
-    }
-
 }

@@ -1,30 +1,17 @@
 package com.example.test.myreceipts;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.UserService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Jacob Enemark on 07-05-2018.
@@ -79,10 +66,10 @@ public class CustomMenu extends AppCompatActivity {
                 openProfileView();
                 return true;
             case R.id.optCreateCategory:
-                createCategory();
+                openCreateCategoryDialog();
                 return true;
             case R.id.optDeleteCategory:
-
+                openDeleteCategoryDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -101,7 +88,7 @@ public class CustomMenu extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void createCategory() {
+    private void openCreateCategoryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create category");
 
@@ -135,27 +122,28 @@ public class CustomMenu extends AppCompatActivity {
         builder.show();
     }
 
-    private void deleteCategory() {
+    private void openDeleteCategoryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete category");
 
 
         // Set up the input
-        final EditText input = new EditText(this);
-        // Specify which input type
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        final Spinner spinner = new Spinner(this);
+        categoryService.addCategoriesToSpinner(spinner, false, false);
+        builder.setView(spinner);
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                //Text input for AlertDialog
-                m_Text = input.getText().toString();
+                if(spinner.getSelectedItem() == null){
+                    dialog.cancel();
+                    return;
+                }
+                categoryService.deleteCategory(spinner.getSelectedItem().toString().toLowerCase());
 
                 //Creates category with input text as name
-                categoryService.createCategory(m_Text);
                 refreshPage();
 
             }
