@@ -263,7 +263,7 @@ public class ImageActivity extends CustomMenu {
     }
 
     private void createOnCategoryRetrievedListener() {
-        categoryService.addCategoriesToSpinner(this, spinner, false, true);
+        categoryService.addCategoriesToSpinner(spinner, false, true);
     }
 
 }

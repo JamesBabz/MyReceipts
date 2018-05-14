@@ -91,7 +91,7 @@ public class MainActivity extends CustomMenu {
 
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
-        categoryService.addCategoriesToButtonAdapter(this, gridView, mProgressBar);
+        categoryService.addCategoriesToButtonAdapter(gridView, mProgressBar);
     }
 
     private void categoryProgressBar() {
