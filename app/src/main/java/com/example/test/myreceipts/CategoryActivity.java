@@ -1,6 +1,7 @@
 package com.example.test.myreceipts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,6 +40,7 @@ import com.google.firebase.storage.StorageReference;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -81,6 +84,7 @@ public class CategoryActivity extends CustomMenu {
         getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
         createSpinner();
 
+        addListenerOnList();
 
     }
 
@@ -152,23 +156,32 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-
-  /*  private Bitmap returnbit(Uri uri){
-        Bitmap bitmap = null;
-        try {
-           bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return bitmap;
-    }*/
-
     public void shit(View v){
+        setList();
+    }
+
+    private void setList(){
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
         listViewCategories.setAdapter(listAdapter);
+
+    }
+
+    //Listens on witch item is clicked
+    private void addListenerOnList() {
+        listViewCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Receipt entry = (Receipt) parent.getItemAtPosition(position);
+                openFriendView(entry);
+            }
+        });
+    }
+
+    //Opens ReceiptActivity with all information about the selected receipt
+    private void openFriendView(Receipt entry){
+
+        Intent intent = new Intent(this, ReceiptActivity.class);
+        startActivity(intent);
     }
 
 }
@@ -199,8 +212,7 @@ class ListAdapter extends ArrayAdapter<Receipt> {
     public View getView(int position, View v, ViewGroup parent) {
 
         if (v == null) {
-            LayoutInflater li = (LayoutInflater) getContext().getSystemService(
-                    Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater li = LayoutInflater.from(context);
 
             v = li.inflate(R.layout.cell_extended, parent,false);
         }

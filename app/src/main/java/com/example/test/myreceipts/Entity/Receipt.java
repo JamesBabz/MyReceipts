@@ -5,11 +5,13 @@ import android.net.Uri;
 
 import com.google.firebase.storage.StorageReference;
 
+import java.io.Serializable;
+
 /**
  * Created by James on 16-04-2018.
  */
 
-public class Receipt {
+public class Receipt implements Serializable {
 
     String Name;
     Bitmap bitmap;

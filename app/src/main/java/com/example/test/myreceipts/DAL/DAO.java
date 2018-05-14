@@ -80,49 +80,6 @@ public class DAO {
 
         return returnList;
     }
-    public void getAllReceiptsForCategory(final String userUid, String category, Callback callback) {
-
-        mStore.document("users/" + userUid).collection("categories").document(category).collection(FILEUIDS_COLLECTION).get() .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        getFilesFromStorage(userUid, document.getId());
-                    }
-                } else {
-                    Log.w("shiat", "Error getting documents.", task.getException());
-                }
-            }
-        });
-
-    }
-
-    private void getFilesFromStorage(String userUid, final String fileUid){
-
-        final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileUid );
-        storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
-            @Override
-            public void onSuccess(StorageMetadata storageMetadata) {
-              final String fileName = storageMetadata.getCustomMetadata("name");
-                Log.d("fileMetadata", fileName);
-                  storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                      @Override
-                      public void onSuccess(Uri uri) {
-                          Receipt rec = new Receipt();
-                          rec.setName(fileName);
-                          rec.setURL(uri);
-
-                      }
-                  }).addOnFailureListener(new OnFailureListener() {
-                      @Override
-                      public void onFailure(@NonNull Exception exception) {
-                          // Handle any errors
-                      }
-                  });
-
-            }
-        });
-    }
 
     public void saveReceipt(final Context context, Uri uri, final Map<String, Object> information) {
         // Generates a random uid
