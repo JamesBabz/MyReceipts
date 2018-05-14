@@ -23,6 +23,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.Callback;
+import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.Receipt;
@@ -37,7 +38,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
+<<<<<<< HEAD
 import java.io.Console;
+=======
+import java.io.BufferedInputStream;
+>>>>>>> Development
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +50,7 @@ import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,11 +64,10 @@ public class CategoryActivity extends CustomMenu {
     Spinner spinner;
     ListView listViewCategories;
     ListAdapter listAdapter;
-    List<Receipt> allReceipts;
-     List<Receipt> returnList = new ArrayList<>();
+    List<Receipt> returnList = new ArrayList<>();
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
-    Bitmap bitmap;
+    private ImageHandler imageHandler = new ImageHandler();
 
     public CategoryActivity() {
         super(true, true);
@@ -80,8 +85,6 @@ public class CategoryActivity extends CustomMenu {
         mStorage = FirebaseStorage.getInstance().getReference();
         listViewCategories = findViewById(R.id.listViewCategories);
         String userUid = userService.getCurrentUser().getUid();
-       // allReceipts = receiptService.getReceipts(userUid, getIntent().getExtras().getString("categoryName"));
-
         getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
 
     }
@@ -90,8 +93,9 @@ public class CategoryActivity extends CustomMenu {
     protected void onResume() {
         super.onResume();
         createSpinner();
-
         addListenerOnList();
+
+        setList();
 
     }
 
@@ -103,42 +107,53 @@ public class CategoryActivity extends CustomMenu {
         spinner.setAdapter(adapter);
     }
 
-
+    // Get all file uids from database, in the selected category
     public void getAllReceiptsForCategory(final String userUid, final String category) {
 
-        mStore.document("users/" + userUid).collection("categories").document(category).collection("fileuids").get() .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
+        mStore.document("users/" + userUid).collection("categories").document(category).collection("fileuids").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<String> test = new ArrayList<>();
+                    List<String> fileUids = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        test.add(document.getId());
+                        fileUids.add(document.getId());
                     }
-
-                    getFilesFromStorage(userUid, test);
+                    listAdapter.notifyDataSetChanged(); // new changes to the list
+                    getFilesFromStorage(userUid, fileUids);
                 } else {
-                    Log.w("shiat", "Error getting documents.", task.getException());
+                    Log.w("error", "Error getting documents.", task.getException());
                 }
             }
         });
     }
 
-    private void getFilesFromStorage(String userUid, List<String> fileuids){
+    //Gets the image from firebase storage with the file uid and user uid
+    private void getFilesFromStorage(String userUid, List<String> fileuids) {
 
+<<<<<<< HEAD
         for (final String fileuid:fileuids) {
+=======
+        //for all file uids in the list, it wil:
+        for (String fileuid : fileuids) {
+>>>>>>> Development
 
-            final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid );
+            // gets the reference to the single file in storage, in the user's folder in storage
+            final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid);
 
+            // gets the file name, in the metadata which saved on the file by upload
             storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                 @Override
                 public void onSuccess(StorageMetadata storageMetadata) {
                     final String fileName = storageMetadata.getCustomMetadata("name");
-                    Log.d("fileMetadata", fileName);
+                    // gets the uri / url (something mysterious about this, java does not if it is an Uri or url)
+                    //-to make sure it is correct form, it will be converted to bitmap - line 147
                     storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
-                        public void onSuccess(Uri uri) {
-                            Receipt rec = new Receipt();
+                        public void onSuccess(final Uri uri) {
+                            final Receipt rec = new Receipt();
                             rec.setName(fileName);
+<<<<<<< HEAD
                             rec.setURL(uri.toString());
                             rec.setId(fileuid);
 
@@ -153,19 +168,35 @@ public class CategoryActivity extends CustomMenu {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             // Handle any errors
+=======
+
+                            //TODO not a good solution, how to refactor this?!
+                            Thread thread = new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    try {
+                                        rec.setBitmap(imageHandler.getImageBitmap(uri.toString()));
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                            thread.start();
+                            listAdapter.notifyDataSetChanged(); // notify the list list about changes
+                            returnList.add(rec); // the arrayList for the ListAdapter, to set the list
+>>>>>>> Development
                         }
                     });
-
                 }
             });
         }
     }
 
-    public void shit(View v){
-        setList();
-    }
 
-    private void setList(){
+
+
+    private void setList() {
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
         listViewCategories.setAdapter(listAdapter);
     }
@@ -176,111 +207,24 @@ public class CategoryActivity extends CustomMenu {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Receipt entry = (Receipt) parent.getItemAtPosition(position);
-                openFriendView(entry);
+                openReceiptView(entry);
             }
         });
     }
 
     //Opens ReceiptActivity with all information about the selected receipt
-    private void openFriendView(Receipt entry){
+    private void openReceiptView(Receipt entry) {
 
         Intent intent = new Intent(this, ReceiptActivity.class);
         intent.putExtra("RECEIPT", entry);
+<<<<<<< HEAD
         Log.d("HELLO", entry.getName());
+=======
+>>>>>>> Development
         startActivity(intent);
     }
 
 }
 
 
-class ListAdapter extends ArrayAdapter<Receipt> {
 
-    private List<Receipt> receipts;
-    Context context;
-    ReceiptService receiptService;
-
-    // Array of colors to set in listView
-    private final int[] colors = {
-            Color.parseColor("#ffffff"),
-            Color.parseColor("#b3cbf2")
-    };
-
-    public ListAdapter(Context context, int textViewResourceId,
-                       List<Receipt> receipts) {
-        super(context, textViewResourceId, receipts);
-        this.receipts = receipts;
-        this.context = context;
-        receiptService = new ReceiptService();
-    }
-
-
-    @Override
-    public View getView(int position, View v, ViewGroup parent) {
-
-        if (v == null) {
-            LayoutInflater li = LayoutInflater.from(context);
-
-            v = li.inflate(R.layout.cell_extended, parent,false);
-        }
-
-        v.setBackgroundColor(colors[position % colors.length]);
-
-
-
-
-        final Receipt receipt = receipts.get(position);
-
-        TextView name = v.findViewById(R.id.twReceiptName);
-        TextView date = v.findViewById(R.id.twReceiptDate);
-        final ImageView receiptImg = v.findViewById(R.id.imageViewReceipt);
-
-        name.setText(receipt.getName());
-        date.setText(receipt.getDate());
-       // receiptImg.setImageBitmap(receipt.getBitmap());
-
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try  {
-                    loadImageFromURL(receipt, receiptImg);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
-
-        return v;
-    }
-
-    private void loadImageFromURL(Receipt receipt, ImageView receiptImg) {
-        loadImageFromURL(receipt.getURL().toString(), receiptImg);
-    }
-
-    public boolean loadImageFromURL(String fileUrl,
-                                    ImageView iv){
-        try {
-
-            URL myFileUrl = new URL (fileUrl);
-            HttpURLConnection conn =
-                    (HttpURLConnection) myFileUrl.openConnection();
-            conn.setDoInput(true);
-            conn.connect();
-
-            InputStream is = conn.getInputStream();
-            iv.setImageBitmap(BitmapFactory.decodeStream(is));
-
-            return true;
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-}
