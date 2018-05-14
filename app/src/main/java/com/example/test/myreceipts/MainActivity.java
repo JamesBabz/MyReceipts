@@ -87,7 +87,7 @@ public class MainActivity extends CustomMenu {
     }
 
 
-    // TODO Move database call to DAO. Duplicated code in ImageActivity
+    // TODO Move database call to DAO. Duplicated code in ImageActivity and CustomMenu
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
         categories = new ArrayList<>();

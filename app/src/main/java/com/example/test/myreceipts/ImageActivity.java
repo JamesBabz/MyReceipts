@@ -259,7 +259,7 @@ public class ImageActivity extends CustomMenu {
         });
     }
 
-    // TODO Move database call to DAO. Duplicated code in MainActivity
+    // TODO Move database call to DAO. Duplicated code in MainActivity and CustomMenu
     private void createOnCategoryRetrievedListener() {
         categories = new ArrayList<>();
         String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
