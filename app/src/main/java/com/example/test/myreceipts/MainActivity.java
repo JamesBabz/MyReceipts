@@ -87,33 +87,7 @@ public class MainActivity extends CustomMenu {
 
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
-<<<<<<< HEAD
-        categories = new ArrayList<>();
-        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-        mStore.collection("users").document(getCurrentUser().getUid()).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            if (document.getId().equals("favorites")) {
-                                categories.add(0, document.getId());
-                            } else {
-                                categories.add(document.getId());
-                            }
-                        }
-
-                        ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
-                        gridView.setAdapter(buttonAdapter);
-
-                        categoryProgressBar();
-                    }
-                });
-
-
-=======
         categoryService.addCategoriesToButtonAdapter(gridView, mProgressBar);
->>>>>>> Development
     }
 
     private void categoryProgressBar() {
