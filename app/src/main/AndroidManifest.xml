@@ -35,6 +35,8 @@
             android:screenOrientation="portrait"></activity>
         <activity android:name=".ProfileActivity"
             android:screenOrientation="portrait"></activity>
+        <activity android:name=".ReceiptActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
