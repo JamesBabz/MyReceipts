@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">MyReceipts</string>
+    <string name="recent_images">Recent Images</string>
+    <string name="categories_header">Categories</string>
+    <string name="sort_by">Sort By: </string>
+    <string-array name="group_sort_by_array">
+        <item>Name</item>
+        <item>Date</item>
+    </string-array>
 </resources>
