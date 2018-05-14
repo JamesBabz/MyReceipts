@@ -92,6 +92,7 @@ public class MainActivity extends CustomMenu {
 
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
+<<<<<<< HEAD
         categories = new ArrayList<>();
         FirebaseFirestore mStore = FirebaseFirestore.getInstance();
         mStore.collection("users").document(currentUserId).collection("categories")
@@ -115,7 +116,9 @@ public class MainActivity extends CustomMenu {
                 });
 
 
+=======
         categoryService.addCategoriesToButtonAdapter(gridView, mProgressBar);
+>>>>>>> Development
     }
 
     private void categoryProgressBar() {
