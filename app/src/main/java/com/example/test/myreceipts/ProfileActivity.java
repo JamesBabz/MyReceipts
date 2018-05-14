@@ -2,6 +2,7 @@ package com.example.test.myreceipts;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.test.myreceipts.BLL.Callback;
 import com.example.test.myreceipts.BLL.UserService;
+import com.example.test.myreceipts.Entity.Receipt;
 import com.example.test.myreceipts.Entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -78,7 +80,8 @@ private boolean isThereAnUser = true;
                txtFirstname.setText(model.getFirstname());
                txtLastname.setText(model.getLastname());
            }
-           });
+
+       });
 
     }
 
