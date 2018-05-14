@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -56,6 +57,7 @@ public class ImageActivity extends CustomMenu {
     private String mTimestamp;
     private ImageHandler imgHandler;
     private ReceiptService receiptService;
+    private CategoryService categoryService;
 
     boolean setFavorite = false;
 
@@ -86,6 +88,7 @@ public class ImageActivity extends CustomMenu {
 
         date.setText("Date:");
         receiptService = new ReceiptService();
+        categoryService = new CategoryService();
 
         createListeners();
         mTimestamp = getTimeStamp();
@@ -259,34 +262,10 @@ public class ImageActivity extends CustomMenu {
         });
     }
 
-    // TODO Move database call to DAO. Duplicated code in MainActivity and CustomMenu
     private void createOnCategoryRetrievedListener() {
-        categories = new ArrayList<>();
-        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-        mStore.collection("users").document(user).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String cat = document.getId();
-                            if (!cat.equals("favorites")) {
-                                cat = cat.substring(0, 1).toUpperCase() + cat.substring(1);
-                                categories.add(cat);
-                            }
-                        }
-                        createSpinner();
-                    }
-                });
-
+        categoryService.addCategoriesToSpinner(spinner, false, true);
     }
 
-    private void createSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
 }
 
 
