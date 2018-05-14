@@ -40,6 +40,8 @@ public class MainActivity extends CustomMenu {
 
     Boolean categoryProgress;
 
+    private String currentUserId;
+
     List<String> categories = new ArrayList<>();
 
     private CategoryService categoryService;
@@ -61,6 +63,9 @@ public class MainActivity extends CustomMenu {
         btnCapture = findViewById(R.id.btnCapture);
         tvGroupHeader = findViewById(R.id.tvGroupHeader);
         ButterKnife.bind(this);
+
+        Bundle extras = getIntent().getExtras();
+        currentUserId = extras.getString("USER");
 
         ReceiptService receiptService = new ReceiptService();
 
@@ -89,7 +94,7 @@ public class MainActivity extends CustomMenu {
         categoryProgressBar();
         categories = new ArrayList<>();
         FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-        mStore.collection("users").document(getCurrentUser().getUid()).collection("categories")
+        mStore.collection("users").document(currentUserId).collection("categories")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override

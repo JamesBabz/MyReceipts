@@ -13,22 +13,12 @@ import java.io.Serializable;
 
 public class Receipt implements Serializable {
 
-    String Id;
-
-    public String getId() {
-        return Id;
-    }
-
-    public void setId(String id) {
-        Id = id;
-    }
-
     String Name;
     Bitmap bitmap;
     String Category;
     String Date;
     Boolean IsFavorite;
-    String URL;
+    Uri URL;
 
     public Receipt() {
     }
@@ -65,11 +55,11 @@ public class Receipt implements Serializable {
         IsFavorite = favorite;
     }
 
-    public String getURL() {
+    public Uri getURL() {
         return URL;
     }
 
-    public void setURL(String URL) {
+    public void setURL(Uri URL) {
         this.URL = URL;
     }
 

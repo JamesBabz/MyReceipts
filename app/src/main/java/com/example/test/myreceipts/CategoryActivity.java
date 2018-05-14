@@ -37,7 +37,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.Console;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -83,19 +82,12 @@ public class CategoryActivity extends CustomMenu {
        // allReceipts = receiptService.getReceipts(userUid, getIntent().getExtras().getString("categoryName"));
 
         getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-
         createSpinner();
 
         addListenerOnList();
 
     }
+
 
     private void createSpinner() {
         spinner = findViewById(R.id.spinnerSortBy);
@@ -123,11 +115,12 @@ public class CategoryActivity extends CustomMenu {
                 }
             }
         });
+
     }
 
     private void getFilesFromStorage(String userUid, List<String> fileuids){
 
-        for (final String fileuid:fileuids) {
+        for (String fileuid:fileuids) {
 
             final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid );
 
@@ -141,14 +134,14 @@ public class CategoryActivity extends CustomMenu {
                         public void onSuccess(Uri uri) {
                             Receipt rec = new Receipt();
                             rec.setName(fileName);
-                            rec.setURL(uri.toString());
-                            rec.setId(fileuid);
+                            rec.setURL(uri);
 
                            // rec.setBitmap(returnbit(uri));
 
 
 
                             returnList.add(rec);
+
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -170,6 +163,7 @@ public class CategoryActivity extends CustomMenu {
     private void setList(){
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
         listViewCategories.setAdapter(listAdapter);
+
     }
 
     //Listens on witch item is clicked
@@ -187,8 +181,7 @@ public class CategoryActivity extends CustomMenu {
     private void openFriendView(Receipt entry){
 
         Intent intent = new Intent(this, ReceiptActivity.class);
-        intent.putExtra("RECEIPT", entry);
-        Log.d("HELLO", entry.getName());
+        //intent.putExtra("RECEIPT", entry);
         startActivity(intent);
     }
 
