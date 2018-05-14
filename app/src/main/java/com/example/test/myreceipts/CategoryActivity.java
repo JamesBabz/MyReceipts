@@ -181,6 +181,7 @@ public class CategoryActivity extends CustomMenu {
     private void openFriendView(Receipt entry){
 
         Intent intent = new Intent(this, ReceiptActivity.class);
+        //intent.putExtra("RECEIPT", entry);
         startActivity(intent);
     }
 
