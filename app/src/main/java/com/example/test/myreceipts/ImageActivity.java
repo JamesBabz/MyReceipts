@@ -7,23 +7,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +50,7 @@ public class ImageActivity extends CustomMenu {
     private String mTimestamp;
     private ImageHandler imgHandler;
     private ReceiptService receiptService;
+    private CategoryService categoryService;
 
     boolean setFavorite = false;
 
@@ -82,26 +77,33 @@ public class ImageActivity extends CustomMenu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_activity);
 
-        ButterKnife.bind(this);
+        ButterKnife.bind(this); // Binds the views with their variable names
 
         date.setText("Date:");
         receiptService = new ReceiptService();
+        categoryService = new CategoryService();
+        imgHandler = new ImageHandler();
+        mTimestamp = getTimeStamp();
 
         createListeners();
-        mTimestamp = getTimeStamp();
-        imgHandler = new ImageHandler();
     }
 
-    //Listeners to avoid having them all in onCreate
-    public void createListeners() {
-        takePicture();
-        isSetFavorite();
-        saveReceipt();
+    /**
+     * A method to create all listeners for the class
+     */
+    private void createListeners() {
+        createOnPictureButtonClickedListener();
+        createIsSetFavoriteListener();
+        createOnSaveReceiptListener();
         createOnCategoryRetrievedListener();
     }
 
-    //Creates or check if there is a folder for pictures
-    private String appFolderCheckandCreate() {
+    /**
+     * Checks for app folder path and create if it doesnt exist
+     *
+     * @return - The path for the app folder
+     */
+    private String appFolderCheckAndCreate() {
 
         String appFolderPath = "";
         File externalStorage = Environment.getExternalStorageDirectory();
@@ -121,18 +123,24 @@ public class ImageActivity extends CustomMenu {
         return appFolderPath;
     }
 
-    //Opens the intent for camera
-    private void takePicture() {
+    /**
+     * Handles onClick event for the camera button
+     */
+    private void createOnPictureButtonClickedListener() {
         ivPicture.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                onClickTakePics();
+                startImageCaptureIntent();
             }
         });
     }
 
-    //returns a given timestamp for a picture
+    /**
+     * Gets the current time
+     *
+     * @return - The current time formatted as "yyyy-MM-dd HH:mm:ss"
+     */
     private String getTimeStamp() {
 
         final long timestamp = new Date().getTime();
@@ -146,9 +154,11 @@ public class ImageActivity extends CustomMenu {
         return timeString;
     }
 
-    //Creates the intent
-    private void onClickTakePics() {
-        mFile = new File(appFolderCheckandCreate(), "img" + mTimestamp + ".jpg");
+    /**
+     * Starts the intent used for taking pictures
+     */
+    private void startImageCaptureIntent() {
+        mFile = new File(appFolderCheckAndCreate(), "img" + mTimestamp + ".jpg");
         uriSavedImage = Uri.fromFile(mFile);
 
         // create Intent to take a picture
@@ -160,18 +170,25 @@ public class ImageActivity extends CustomMenu {
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
     }
 
-    //On result OK runs the picture through the exifInterface to set ORIENTATION correctly
-    //sets the taken picture on imageView
-    //if no resultcode OK toast
+
+    /**
+     * Checks if the returned activity result is ok or cancelled
+     * Sets image if resultCode is ok
+     *
+     * @param requestCode - The requested code for the activity
+     * @param resultCode  - The result sent from the activity
+     * @param data        - the Intent (not used)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-
+                // On result OK runs the picture through the exifInterface to set ORIENTATION correctly
                 exifInterface();
 
                 date.setText("Date: " + mTimestamp);
 
+                // Uses the imageHandler to set the image
                 ivPicture.setImageURI(imgHandler.bitmapToUriConverter(getBaseContext(), rotatedBitmap));
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -183,8 +200,9 @@ public class ImageActivity extends CustomMenu {
         }
     }
 
-
-    //gets the current rotation of the bitmap, rotating it if needed.
+    /**
+     * Gets the rotation of the image and rotates if needed
+     */
     public void exifInterface() {
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uriSavedImage);
@@ -198,6 +216,7 @@ public class ImageActivity extends CustomMenu {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // The current orientation of the image
         int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_UNDEFINED);
 
@@ -220,11 +239,15 @@ public class ImageActivity extends CustomMenu {
             default:
                 rotatedBitmap = bitmap;
         }
+
+        //Rotate the image with the imageHandler
         rotatedBitmap = imgHandler.rotateImage(bitmap, rotation);
     }
 
-    //Set an receipt as favorite
-    public void isSetFavorite() {
+    /**
+     * Creates onClick listener for the favorite icon
+     */
+    public void createIsSetFavoriteListener() {
 
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -234,14 +257,17 @@ public class ImageActivity extends CustomMenu {
                 } else if (setFavorite) {
                     favorite.setImageResource(android.R.drawable.star_big_off);
                 }
-                setFavorite = !setFavorite;
+                setFavorite = !setFavorite; // Swaps between true or false
             }
         });
     }
 
-    //Saves the receipe on button save click
-    public void saveReceipt() {
+    /**
+     * Creates onClick listner for the save button
+     */
+    public void createOnSaveReceiptListener() {
         final String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // Create a hashMap containing all needed information for the receipt
         final Map<String, Object> information = new HashMap<>();
 
         save.setOnClickListener(new View.OnClickListener() {
@@ -249,44 +275,20 @@ public class ImageActivity extends CustomMenu {
 
             @Override
             public void onClick(View view) {
-                information.put("name", etName.getText());
-                information.put("user", user);
-                information.put("category", spinner.getSelectedItem().toString().toLowerCase());
-                information.put("timestamp", mTimestamp);
-                information.put("favorite", setFavorite);
-                receiptService.saveReceipt(getBaseContext(), rotatedBitmap, information);
+                information.put("name", etName.getText()); // Name of the receipt
+                information.put("user", user); // ID of current user
+                information.put("category", spinner.getSelectedItem().toString().toLowerCase()); // Selected category
+                information.put("timestamp", mTimestamp); // The time the receipt is created
+                information.put("favorite", setFavorite); // is it a favorite?
+                receiptService.saveReceipt(getBaseContext(), rotatedBitmap, information); // Save it
             }
         });
     }
 
-    // TODO Move database call to DAO. Duplicated code in MainActivity
     private void createOnCategoryRetrievedListener() {
-        categories = new ArrayList<>();
-        String user = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore mStore = FirebaseFirestore.getInstance();
-        mStore.collection("users").document(user).collection("categories")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String cat = document.getId();
-                            if (!cat.equals("favorites")) {
-                                cat = cat.substring(0, 1).toUpperCase() + cat.substring(1);
-                                categories.add(cat);
-                            }
-                        }
-                        createSpinner();
-                    }
-                });
-
+        categoryService.addCategoriesToSpinner(spinner, false, true);
     }
 
-    private void createSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, categories);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
 }
 
 
