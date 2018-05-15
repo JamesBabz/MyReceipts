@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.Receipt;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -76,6 +77,8 @@ public class ReceiptActivity extends CustomMenu {
         receipt = (Receipt) extras.getSerializable("RECEIPT");
 
         tvName.setText(receipt.getName());
+        ImageHandler imageHandler = new ImageHandler();
+        ivPicture.setImageBitmap(imageHandler.getImageBitmap(receipt.getURL()));
 
 
         buttonTest.setOnClickListener(new View.OnClickListener() {
