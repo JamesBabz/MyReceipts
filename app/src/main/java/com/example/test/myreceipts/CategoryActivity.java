@@ -87,6 +87,16 @@ public class CategoryActivity extends CustomMenu {
 
         setList();
 
+        checkStrictMode();
+
+    }
+
+    private void checkStrictMode() {
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy =
+                    new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
     }
 
 
@@ -124,7 +134,7 @@ public class CategoryActivity extends CustomMenu {
     private void getFilesFromStorage(String userUid, List<String> fileuids) {
 
         //for all file uids in the list, it wil:
-        for (String fileuid : fileuids) {
+        for (final String fileuid : fileuids) {
 
             // gets the reference to the single file in storage, in the user's folder in storage
             final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid);
@@ -141,20 +151,19 @@ public class CategoryActivity extends CustomMenu {
                         public void onSuccess(final Uri uri) {
                             final Receipt rec = new Receipt();
                             rec.setName(fileName);
+                            rec.setId(fileuid);
 
                             //TODO not a good solution, how to refactor this?!
-                            Thread thread = new Thread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    try {
-                                        rec.setBitmap(imageHandler.getImageBitmap(uri.toString()));
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            thread.start();
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                rec.setBitmap(imageHandler.getImageBitmap(uri.toString()));
+                                            }
+                                        });
+
+
+
                             listAdapter.notifyDataSetChanged(); // notify the list list about changes
                             returnList.add(rec); // the arrayList for the ListAdapter, to set the list
                         }
@@ -193,6 +202,3 @@ public class CategoryActivity extends CustomMenu {
     }
 
 }
-
-
-

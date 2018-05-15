@@ -40,8 +40,6 @@ public class MainActivity extends CustomMenu {
 
     Boolean categoryProgress;
 
-    private String currentUserId;
-
     List<String> categories = new ArrayList<>();
 
     private CategoryService categoryService;
@@ -63,9 +61,6 @@ public class MainActivity extends CustomMenu {
         btnCapture = findViewById(R.id.btnCapture);
         tvGroupHeader = findViewById(R.id.tvGroupHeader);
         ButterKnife.bind(this);
-
-        Bundle extras = getIntent().getExtras();
-        currentUserId = extras.getString("USER");
 
         ReceiptService receiptService = new ReceiptService();
 
