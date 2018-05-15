@@ -67,6 +67,12 @@ public class CategoryService {
         dao.deleteCategory(catName);
     }
 
+    /**
+     * Moves a category and its content from one to another
+     *
+     * @param fromCatName The category to move
+     * @param toCatName   The name of the new category
+     */
     public void moveCategory(String fromCatName, String toCatName) {
         dao.renameCategory(fromCatName, toCatName);
     }
