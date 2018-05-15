@@ -1,23 +1,17 @@
 package com.example.test.myreceipts;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Spinner;
 
+import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.UserService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Jacob Enemark on 07-05-2018.
@@ -25,23 +19,20 @@ import java.util.Map;
 
 public class CustomMenu extends AppCompatActivity {
 
-    UserService mUserService;
+    private UserService mUserService;
+    private CategoryService categoryService;
+
     private String m_Text = "";
 
-
-    private FirebaseAuth fAuth;
-    private FirebaseFirestore db;
     boolean backBtn;
     boolean profileMenuItem;
 
-    public CustomMenu(Boolean backBtn, Boolean profileMenuItem)
-    {
+    public CustomMenu(Boolean backBtn, Boolean profileMenuItem) {
         mUserService = new UserService();
+        categoryService = new CategoryService();
         this.backBtn = backBtn;
         this.profileMenuItem = profileMenuItem;
 
-        fAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
     }
 
     @Override
@@ -49,17 +40,17 @@ public class CustomMenu extends AppCompatActivity {
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_top, menu);
-        if(backBtn) {
+        if (backBtn) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        if(!profileMenuItem) {
+        if (!profileMenuItem) {
             MenuItem item = menu.findItem(R.id.optProfile);
             item.setVisible(false);
         }
         return true;
     }
 
-    public boolean onSupportNavigateUp(){
+    public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
@@ -71,18 +62,21 @@ public class CustomMenu extends AppCompatActivity {
             case R.id.optSignOut:
                 signOut();
                 return true;
-                case R.id.optProfile:
+            case R.id.optProfile:
                 openProfileView();
                 return true;
             case R.id.optCreateCategory:
-                createCategory();
+                openCreateCategoryDialog();
+                return true;
+            case R.id.optDeleteCategory:
+                openDeleteCategoryDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void signOut(){
+    public void signOut() {
         mUserService.signOut();
         Intent intent = new Intent(CustomMenu.this, SignInActivity.class);
         startActivity(intent);
@@ -94,18 +88,17 @@ public class CustomMenu extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void createCategory()
-    {
+    private void openCreateCategoryDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Create category");
 
-    // Set up the input
+        // Set up the input
         final EditText input = new EditText(this);
-    // Specify which input type
+        // Specify which input type
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
-    // Set up the buttons
+        // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -113,15 +106,10 @@ public class CustomMenu extends AppCompatActivity {
                 //Text input for AlertDialog
                 m_Text = input.getText().toString();
 
-                //creates exist field
-                Map<String, Boolean> exists = new HashMap<>();
-                exists.put("exists", true);
-                db.collection("users").document(getCurrentUser().getUid()).collection("categories").document(m_Text.toLowerCase()).set(exists);
+                //Creates category with input text as name
+                categoryService.createCategory(m_Text);
+                refreshPage();
 
-                //Refresh page for new categories
-                Intent intent = getIntent();
-                finish();
-                startActivity(intent);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -134,7 +122,47 @@ public class CustomMenu extends AppCompatActivity {
         builder.show();
     }
 
-    public FirebaseUser getCurrentUser(){
-        return fAuth.getCurrentUser();
+    private void openDeleteCategoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete category");
+
+
+        // Set up the input
+        final Spinner spinner = new Spinner(this);
+        categoryService.addCategoriesToSpinner(spinner, false, false);
+        builder.setView(spinner);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if(spinner.getSelectedItem() == null){
+                    dialog.cancel();
+                    return;
+                }
+                categoryService.deleteCategory(spinner.getSelectedItem().toString().toLowerCase());
+
+                //Creates category with input text as name
+                refreshPage();
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
+
+    private void refreshPage() {
+        //Refresh page for new categories
+        Intent intent = getIntent();
+        finish();
+        startActivity(intent);
+    }
+
 }

@@ -110,7 +110,7 @@ public class SignInActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                                     //if success it generate a new folder for the user. 'favorites*. The user will then always gets this folder, which is needed
-                                    userService.setFavoritesFolder();
+                                    userService.setStandardFolders();
                                 }
                             }));
 
