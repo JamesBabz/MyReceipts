@@ -21,8 +21,11 @@
 
         />
     <item
+        android:id="@+id/optRenameCategory"
+        android:title="Rename category" />
+    <item
         android:id="@+id/optDeleteCategory"
-        android:title="Delete Category" />
+        android:title="Delete category" />
 
 
 </menu>
