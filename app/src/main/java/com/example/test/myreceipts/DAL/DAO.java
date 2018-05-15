@@ -93,9 +93,9 @@ public class DAO {
     /**
      * Save the receipt to the firebase and the firestore
      *
-     * @param context     - Context for making toast on success
-     * @param uri         - The uri of the image to save
-     * @param information - All the information necesarry from the image
+     * @param context     Context for making toast on success
+     * @param uri         The uri of the image to save
+     * @param information All the information necesarry from the image
      */
     public void saveReceipt(final Context context, Uri uri, final Map<String, Object> information) {
         // Generates a random uid
@@ -127,9 +127,9 @@ public class DAO {
     /**
      * Add to "favorites" in firebase
      *
-     * @param storageuid  - The reference of the image to the firestore
-     * @param information - All the information needed to set the reference
-     * @param exists      - A HashMap to set a default value
+     * @param storageuid  The reference of the image to the firestore
+     * @param information All the information needed to set the reference
+     * @param exists      A HashMap to set a default value
      */
     private void addToFavoritesInDB(String storageuid, Map<String, Object> information, HashMap<String, Boolean> exists) {
         mStore.collection(USERS_COLLECTION)
@@ -144,9 +144,9 @@ public class DAO {
     /**
      * Add to "AllFiles" in firebase
      *
-     * @param storageuid  - The reference of the image to the firestore
-     * @param information - All the information needed to set the reference
-     * @param exists      - A HashMap to set a default value
+     * @param storageuid  The reference of the image to the firestore
+     * @param information All the information needed to set the reference
+     * @param exists      A HashMap to set a default value
      */
     private void addToAllFilesInDB(String storageuid, Map<String, Object> information, HashMap<String, Boolean> exists) {
         // Reference to document
@@ -169,9 +169,9 @@ public class DAO {
     /**
      * Add to "category" in firebase
      *
-     * @param storageuid  - The reference of the image to the firestore
-     * @param information - All the information needed to set the reference
-     * @param exists      - A HashMap to set a default value
+     * @param storageuid  The reference of the image to the firestore
+     * @param information All the information needed to set the reference
+     * @param exists      A HashMap to set a default value
      */
     @NonNull
     private void addToCategoryInDB(String storageuid, Map<String, Object> information, HashMap<String, Boolean> exists) {
@@ -193,7 +193,7 @@ public class DAO {
     /**
      * Deletes a category from firebase
      *
-     * @param catName - The name of the category to delete
+     * @param catName The name of the category to delete
      */
     public void deleteCategory(String catName) {
         CollectionReference catRef = mStore.collection(USERS_COLLECTION)
@@ -208,8 +208,8 @@ public class DAO {
      * "Moves" the references to the images from the category to the "unassigned" by duplicating
      * before deleting
      *
-     * @param catRef  - The reference to the "category" collection
-     * @param catName - The name of the category used for document reference
+     * @param catRef  The reference to the "category" collection
+     * @param catName The name of the category used for document reference
      */
     private void moveCategoriesToUnassigned(final CollectionReference catRef, String catName) {
         final HashMap<String, Boolean> exists = new HashMap<>();

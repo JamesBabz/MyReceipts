@@ -48,7 +48,7 @@ public class CategoryService {
 
     /**
      * Create a new category
-     * @param catName - Name of the category to add
+     * @param catName Name of the category to add
      */
     public void createCategory(String catName) {
         //creates exist field
@@ -59,7 +59,7 @@ public class CategoryService {
 
     /**
      * Delete a category by name
-     * @param catName - The name of the category
+     * @param catName The name of the category
      */
     public void deleteCategory(String catName){
         dao.deleteCategory(catName);
@@ -68,9 +68,9 @@ public class CategoryService {
     /**
      * The method to call if you want to add the categories to a spinner
      *
-     * @param spinner        - The spinner to populate with the categories
-     * @param showFavorites  - Should the "favorites" category be shown?
-     * @param showUnassigned - Should the "unassigned" category be shown?
+     * @param spinner        The spinner to populate with the categories
+     * @param showFavorites  Should the "favorites" category be shown?
+     * @param showUnassigned Should the "unassigned" category be shown?
      */
     public void addCategoriesToSpinner(Spinner spinner, boolean showFavorites, boolean showUnassigned) {
         HashMap<String, Object> parameters = new HashMap<>();
@@ -83,8 +83,8 @@ public class CategoryService {
     /**
      * The method to call if you want to add the categories to a button adapter
      *
-     * @param gridView     - The gridview where the buttons should be inserted into
-     * @param mProgressBar - A ProgressBar to show incase it takes too long to get the categories
+     * @param gridView     The gridview where the buttons should be inserted into
+     * @param mProgressBar A ProgressBar to show incase it takes too long to get the categories
      */
     public void addCategoriesToButtonAdapter(GridView gridView, ProgressBar mProgressBar) {
         HashMap<String, Object> parameters = new HashMap<>();
@@ -96,8 +96,8 @@ public class CategoryService {
     /**
      * The private method to handle all category calls from the outside
      *
-     * @param parameters  - Whatever parameters have been supplied from previous methods
-     * @param requestedBy - The identifier of which method called this method
+     * @param parameters  Whatever parameters have been supplied from previous methods
+     * @param requestedBy The identifier of which method called this method
      */
     private void handleGetCategories(final HashMap<String, Object> parameters, final String requestedBy) {
         FirebaseFirestore mStore = FirebaseFirestore.getInstance(); // the database
@@ -127,8 +127,8 @@ public class CategoryService {
     /**
      * The private task method that will be called when we want categories for the button adapter
      *
-     * @param task       - The task being run when categories have been gotten from the database
-     * @param parameters - The paramaters from "addCategoriesToButtonAdapter" with the category added
+     * @param task       The task being run when categories have been gotten from the database
+     * @param parameters The paramaters from "addCategoriesToButtonAdapter" with the category added
      */
     private void createButtonAdapterTask(@NonNull Task<QuerySnapshot> task, HashMap<String, Object> parameters) {
         // Get all the parameters from the hashmap
@@ -159,8 +159,8 @@ public class CategoryService {
     /**
      * The private task method that will be called when we want categories for the spinner
      *
-     * @param task       - The task being run when categories have been gotten from the database
-     * @param parameters - The paramaters from "addCategoriesToSpinner" with the category added
+     * @param task       The task being run when categories have been gotten from the database
+     * @param parameters The paramaters from "addCategoriesToSpinner" with the category added
      */
     private void createSpinnerTask(@NonNull Task<QuerySnapshot> task, HashMap<String, Object> parameters) {
         // Get all the parameters from the hashmap
@@ -190,8 +190,8 @@ public class CategoryService {
     /**
      * Creates the spinner with custom array adapter
      *
-     * @param spinner    - The spinner to be created
-     * @param categories - The items for the spinner
+     * @param spinner    The spinner to be created
+     * @param categories The items for the spinner
      */
     private void createSpinner(Spinner spinner, List<String> categories) {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(spinner.getContext(), android.R.layout.simple_spinner_item, categories);
