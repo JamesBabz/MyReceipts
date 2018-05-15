@@ -59,8 +59,12 @@ public class ButtonAdapter extends BaseAdapter {
 
         btn.setText(categoryNames.get(position));
         // filenames is an array of strings
+        if(position == 0){
+            btn.setBackgroundColor(Color.parseColor("#ffb41e"));
+        }else{
+            btn.setBackgroundColor(Color.DKGRAY);
+        }
         btn.setTextColor(Color.WHITE);
-        btn.setBackgroundColor(Color.DKGRAY);
         btn.setId(position);
 
         btn.setOnClickListener(new View.OnClickListener() {
