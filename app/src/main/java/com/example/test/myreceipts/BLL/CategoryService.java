@@ -48,6 +48,7 @@ public class CategoryService {
 
     /**
      * Create a new category
+     *
      * @param catName Name of the category to add
      */
     public void createCategory(String catName) {
@@ -59,10 +60,15 @@ public class CategoryService {
 
     /**
      * Delete a category by name
+     *
      * @param catName The name of the category
      */
-    public void deleteCategory(String catName){
+    public void deleteCategory(String catName) {
         dao.deleteCategory(catName);
+    }
+
+    public void moveCategory(String fromCatName, String toCatName) {
+        dao.renameCategory(fromCatName, toCatName);
     }
 
     /**
