@@ -10,7 +10,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,5 +44,16 @@ public class ReceiptService {
     public void saveReceipt(Context context, Bitmap bitmap, Map<String, Object> information) {
         Uri uri = (imgHandler.bitmapToUriConverter(context, bitmap));
         dao.saveReceipt(context, uri, information);
+    }
+
+    public Date convertDate(String stringDate){
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        try {
+            date = format.parse(stringDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
     }
 }
