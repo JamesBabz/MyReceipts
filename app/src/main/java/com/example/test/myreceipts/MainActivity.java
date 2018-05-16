@@ -14,6 +14,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
@@ -26,10 +27,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -62,6 +65,7 @@ public class MainActivity extends CustomMenu {
         super(false, true);
         categoryService = new CategoryService();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,15 +162,16 @@ public class MainActivity extends CustomMenu {
     }
 
     // Get all file uids from database
-    public void getAllReceiptsForCategory(final String userUid) {
+    private void getAllReceiptsForCategory(final String userUid) {
         // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
         mStore.document("users/" + userUid).collection("allFiles").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
+                if (task.isSuccessful() && task.getResult().getDocuments().size() >= 1) {
                     List<String> receiptUids = new ArrayList<>();
                     TreeMap<Date, String> timeMap = new TreeMap<>();
+
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (!document.getId().equals("0")) {
 
@@ -180,7 +185,9 @@ public class MainActivity extends CustomMenu {
                     // run throw the map 4 times, and gets the last in the sorted map every time.
                     // each time with 'pollLastEntry()' the last value will be deleted after is has been added to the arraylist
                     for (int i = 0; i < 4; i++) {
-                        receiptUids.add(timeMap.pollLastEntry().getValue());
+                        if (timeMap.size() >= 1) {
+                            receiptUids.add(timeMap.pollLastEntry().getValue());
+                        }
 
                     }
 
@@ -200,35 +207,30 @@ public class MainActivity extends CustomMenu {
         for (final String fileuid : fileuids) {
             // gets the reference to the single file in storage, in the user's folder in storage
             final StorageReference storageReference = mStorage.child("receipts/").child(userUid + "/" + fileuid);
-
-            // gets the file name, in the metadata which saved on the file by upload
-            storageReference.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+            //gets the donwnload url on the file from firebase
+            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
-                public void onSuccess(StorageMetadata storageMetadata) {
-                    final String fileName = storageMetadata.getCustomMetadata("name");
-                    //gets the donwnload url on the file from firebase
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(final Uri uri) {
-
-                            //allows the thread. If this not added, the program will crash on main thread
-                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                            StrictMode.setThreadPolicy(policy);
-
-                            //Runs a UI thread to set the images, because it is asynk, and we only want the UI to update or set the images when ready.
-                            runOnUiThread(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    // the 4 image views are a added to a [], each time it gets through the loop, it will get the next imageview to set a new image.
-                                    images[x].setImageBitmap(imageHandler.getImageBitmap(uri.toString()));
-                                    x++;
-                                }
-                            });
-                        }
-                    });
+                public void onSuccess(Uri uri) {
+                    populateImageViews(uri);
                 }
             });
         }
+    }
+
+    private void populateImageViews(final Uri uri) {
+        //allows the thread. If this not added, the program will crash on main thread
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        //Runs a UI thread to set the images, because it is asynk, and we only want the UI to update or set the images when ready.
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // the 4 image views are a added to a [], each time it gets through the loop, it will get the next imageview to set a new image.
+                images[x].setImageBitmap(imageHandler.getImageBitmap(uri.toString()));
+                x++;
+            }
+        });
     }
 }
