@@ -6,15 +6,10 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.test.myreceipts.BLL.Callback;
-import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.Receipt;
-import com.example.test.myreceipts.Entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -50,6 +45,8 @@ public class DAO {
     private static final String FAVORITES_DOCUMENT = "favorites";
     private static final String UNASSIGNED_DOCUMENT = "unassigned";
 
+    CollectionReference catRef;
+
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private String user;
@@ -58,6 +55,9 @@ public class DAO {
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
         user = getInstance().getUid();
+        catRef = mStore.collection(USERS_COLLECTION)
+                .document(user)
+                .collection(CATEGORIES_COLLECTION);
     }
 
     // TODO Not working after DB changes
@@ -132,10 +132,7 @@ public class DAO {
      * @param exists      A HashMap to set a default value
      */
     private void addToFavoritesInDB(String storageuid, Map<String, Object> information, HashMap<String, Boolean> exists) {
-        mStore.collection(USERS_COLLECTION)
-                .document(information.get("user").toString())
-                .collection(CATEGORIES_COLLECTION)
-                .document(FAVORITES_DOCUMENT)
+        catRef.document(FAVORITES_DOCUMENT)
                 .collection(FILEUIDS_COLLECTION)
                 .document(storageuid)
                 .set(exists);
@@ -176,10 +173,7 @@ public class DAO {
     @NonNull
     private void addToCategoryInDB(String storageuid, Map<String, Object> information, HashMap<String, Boolean> exists) {
         // Reference to document
-        DocumentReference catDocRef = mStore.collection(USERS_COLLECTION)
-                .document(information.get("user").toString())
-                .collection(CATEGORIES_COLLECTION)
-                .document(information.get("category").toString().toLowerCase());
+        DocumentReference catDocRef = catRef.document(information.get("category").toString().toLowerCase());
         // Create fieid so it later can be accessed
         catDocRef.set(exists);
 
@@ -196,36 +190,47 @@ public class DAO {
      * @param catName The name of the category to delete
      */
     public void deleteCategory(String catName) {
-        CollectionReference catRef = mStore.collection(USERS_COLLECTION)
-                .document(user)
-                .collection(CATEGORIES_COLLECTION);
-
-        moveCategoriesToUnassigned(catRef, catName);
-        catRef.document(catName).delete();
+        moveAllFilesFromCategoryToCategory(catName, UNASSIGNED_DOCUMENT);
     }
 
     /**
-     * "Moves" the references to the images from the category to the "unassigned" by duplicating
-     * before deleting
+     * Renames a category
      *
-     * @param catRef  The reference to the "category" collection
-     * @param catName The name of the category used for document reference
+     * @param fromCatName The current category name
+     * @param toCatName   The desired category name
      */
-    private void moveCategoriesToUnassigned(final CollectionReference catRef, String catName) {
+    public void renameCategory(String fromCatName, String toCatName) {
+
         final HashMap<String, Boolean> exists = new HashMap<>();
         exists.put("exists", true);
-        catRef.document(catName)
+        catRef.document(toCatName).set(exists); // Create the category
+
+        moveAllFilesFromCategoryToCategory(fromCatName, toCatName); // Move the files
+    }
+
+    /**
+     * "Moves" the references to the images from one category to another by duplicating
+     * before deleting
+     *
+     * @param fromCatName The name of the category to move from used for document reference
+     * @param toCatName   The name of the category to move to used for document reference
+     */
+    private void moveAllFilesFromCategoryToCategory(String fromCatName, final String toCatName) {
+        final HashMap<String, Boolean> exists = new HashMap<>();
+        exists.put("exists", true);
+        catRef.document(fromCatName)
                 .collection(FILEUIDS_COLLECTION)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         for (QueryDocumentSnapshot document : task.getResult()) {
-                            catRef.document(UNASSIGNED_DOCUMENT)
+                            catRef.document(toCatName)
                                     .collection(FILEUIDS_COLLECTION)
                                     .document(document.getId()).set(exists);
                         }
                     }
                 });
+        catRef.document(fromCatName).delete();
     }
 }
