@@ -25,7 +25,12 @@ import static android.app.Activity.RESULT_OK;
 
 public class ImageHandler {
 
-    //gets the bitmap and rotate it
+    /**
+     * Gets the bitmap and rotate it to the given angle
+     * @param source
+     * @param angle
+     * @return
+     */
     public static Bitmap rotateImage(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
@@ -33,8 +38,13 @@ public class ImageHandler {
                 matrix, true);
     }
 
-
-    //get the bitmaps uri, to save as string in DB
+    /**
+     *Returns a bitmap as an URI
+     * Sets quality of new file
+     * @param context
+     * @param mBitmap
+     * @return
+     */
     public Uri bitmapToUriConverter(Context context, Bitmap mBitmap) {
         Uri uri = null;
         try {
@@ -61,6 +71,11 @@ public class ImageHandler {
         return uri;
     }
 
+    /**
+     * Uses bitmap factory to create a bitmap from a given URL
+     * @param url
+     * @return
+     */
     public Bitmap getImageBitmap(String url) {
         Bitmap bm = null;
         try {
