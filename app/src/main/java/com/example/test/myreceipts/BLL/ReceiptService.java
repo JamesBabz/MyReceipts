@@ -24,21 +24,12 @@ import java.util.Map;
 
 public class ReceiptService {
 
-    List<Receipt> receipts = new ArrayList<>();
     DAO dao;
     private ImageHandler imgHandler;
 
     public ReceiptService() {
         dao = new DAO();
         imgHandler = new ImageHandler();
-    }
-
-    public List<Receipt> getReceipts() {
-        return receipts;
-    }
-
-    public List<Receipt> getAllReceiptsForUser(String UID) {
-        return dao.getAllReceiptsForUser(UID);
     }
 
     public void saveReceipt(Context context, Bitmap bitmap, Map<String, Object> information) {
