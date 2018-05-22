@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.UserService;
@@ -213,10 +215,15 @@ public class CustomMenu extends AppCompatActivity {
                     dialog.cancel();
                     return;
                 }
-                categoryService.moveCategory(spinner.getSelectedItem().toString().toLowerCase(), input.getText().toString());
+                Log.d("INPUT", input.getText().toString());
+                if (input.getText().toString().equals("")) {
+                    Toast.makeText(CustomMenu.this, "Rename failed. You did not input a new name", Toast.LENGTH_LONG).show();
+                } else {
+                    categoryService.moveCategory(spinner.getSelectedItem().toString().toLowerCase(), input.getText().toString());
 
-                //Creates category with input text as name
-                refreshPage();
+                    //Creates category with input text as name
+                    refreshPage();
+                }
 
             }
         });

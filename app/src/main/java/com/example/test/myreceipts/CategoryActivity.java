@@ -1,11 +1,13 @@
 package com.example.test.myreceipts;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -144,16 +146,19 @@ public class CategoryActivity extends CustomMenu {
     }
 
     /**
-     * Create a textview in parent
+     * Create a textview in a specific parent
      *
-     * @param parent the view that the text has to bee shown in
-     * @param text   Array
+     * @param parent The parent view for the text
+     * @param text   One or more texts to be shown
      */
     private void createTextView(ViewGroup parent, String... text) {
         parent.removeAllViews();
         for (int i = 0; i < text.length; i++) {
             TextView tvText = new TextView(this);
             tvText.setText(text[i]);
+            tvText.setGravity(Gravity.CENTER);
+            tvText.setBackgroundColor(Color.LTGRAY);
+            tvText.setPadding(0,10,0,10);
             parent.addView(tvText);
         }
     }
