@@ -215,7 +215,6 @@ public class CustomMenu extends AppCompatActivity {
                     dialog.cancel();
                     return;
                 }
-                Log.d("INPUT", input.getText().toString());
                 if (input.getText().toString().equals("")) {
                     Toast.makeText(CustomMenu.this, "Rename failed. You did not input a new name", Toast.LENGTH_LONG).show();
                 } else {
