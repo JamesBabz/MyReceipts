@@ -1,4 +1,5 @@
 package com.example.test.myreceipts;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -6,8 +7,9 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,6 +27,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +47,7 @@ public class CategoryActivity extends CustomMenu {
     private ImageHandler imageHandler = new ImageHandler();
     private String categoryName;
     TextView categoryHeadline;
+    LinearLayout llListContainer;
 
     public CategoryActivity() {
         super(true, true);
@@ -54,6 +58,7 @@ public class CategoryActivity extends CustomMenu {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.category_activity);
         listViewCategories = findViewById(R.id.listViewCategories);
+        llListContainer = findViewById(R.id.llListContainer);
 
         receiptService = new ReceiptService();
         userService = new UserService();
@@ -65,7 +70,6 @@ public class CategoryActivity extends CustomMenu {
         categoryName = getIntent().getExtras().getString("categoryName");
         categoryHeadline.setText(categoryName.toUpperCase());
 
-        createSpinner();
         Thread thread = getFilesFromFirebase(userUid);
         thread.start();
         setList();
@@ -79,11 +83,11 @@ public class CategoryActivity extends CustomMenu {
     @NonNull
     private Thread getFilesFromFirebase(final String userUid) {
         return new Thread() {
-                @Override
-                public void run() {
-                    getAllReceiptsForCategory(userUid, categoryName);
-                }
-            };
+            @Override
+            public void run() {
+                getAllReceiptsForCategory(userUid, categoryName);
+            }
+        };
     }
 
     //Checks for internet connection and permission
@@ -95,15 +99,6 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-
-    private void createSpinner() {
-        spinner = findViewById(R.id.spinnerSortBy);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.group_sort_by_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-    }
-
     // Get all file uids from database, in the selected category
     public void getAllReceiptsForCategory(final String userUid, final String category) {
 
@@ -113,6 +108,14 @@ public class CategoryActivity extends CustomMenu {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     List<String> fileUids = new ArrayList<>();
+                    if(task.getResult().size() <= 1){
+                        if(categoryName.equalsIgnoreCase("favorites")){
+                            createTextView(llListContainer, "No images in category", "Add images to favorites by clicking the star icon");
+                        }else{
+                            createTextView(llListContainer, "No images in category", "Add images to categories when you take them");
+                        }
+                        return;
+                    }
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (!document.getId().equals("0")) {
                             fileUids.add(document.getId());
@@ -126,6 +129,15 @@ public class CategoryActivity extends CustomMenu {
             }
         });
 
+    }
+
+    private void createTextView(ViewGroup parent, String... text) {
+        parent.removeAllViews();
+        for(int i = 0; i< text.length; i++){
+            TextView tvText = new TextView(this);
+            tvText.setText(text[i]);
+            parent.addView(tvText);
+        }
     }
 
     //Gets the image from firebase storage with the file uid and user uid
