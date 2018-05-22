@@ -15,29 +15,19 @@
 
         <TextView
             android:id="@+id/tvGroupName"
-            android:layout_width="170dp"
-            android:layout_height="30dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:padding="10dp"
             android:text="TextView"
+            android:textAppearance="@android:style/TextAppearance.Material.Large"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="103dp" />
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/sort_by" />
-
-        <Spinner
-            android:id="@+id/spinnerSortBy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/llListContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0"
