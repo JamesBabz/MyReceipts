@@ -101,7 +101,7 @@ public class ImageActivity extends CustomMenu {
     /**
      * Checks for app folder path and create if it doesnt exist
      *
-     * @return - The path for the app folder
+     * @return The path for the app folder
      */
     private String appFolderCheckAndCreate() {
 
@@ -139,7 +139,7 @@ public class ImageActivity extends CustomMenu {
     /**
      * Gets the current time
      *
-     * @return - The current time formatted as "yyyy-MM-dd HH:mm:ss"
+     * @return The current time formatted as "yyyy-MM-dd HH:mm:ss"
      */
     private String getTimeStamp() {
 
@@ -175,9 +175,9 @@ public class ImageActivity extends CustomMenu {
      * Checks if the returned activity result is ok or cancelled
      * Sets image if resultCode is ok
      *
-     * @param requestCode - The requested code for the activity
-     * @param resultCode  - The result sent from the activity
-     * @param data        - the Intent (not used)
+     * @param requestCode The requested code for the activity
+     * @param resultCode  The result sent from the activity
+     * @param data        The Intent (not used)
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

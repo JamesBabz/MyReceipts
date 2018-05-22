@@ -60,7 +60,6 @@ public class ListAdapter extends ArrayAdapter<Receipt> {
         date.setText(receipt.getDate());
         receiptImg.setImageBitmap(receipt.getBitmap());
 
-        notifyDataSetChanged();
         return v;
     }
 

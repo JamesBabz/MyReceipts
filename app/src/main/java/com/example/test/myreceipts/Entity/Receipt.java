@@ -6,6 +6,7 @@ import android.net.Uri;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by James on 16-04-2018.
@@ -13,12 +14,29 @@ import java.io.Serializable;
 
 public class Receipt implements Serializable {
 
+
+
+    String Id;
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
     String Name;
     Bitmap bitmap;
     String Category;
     String Date;
     Boolean IsFavorite;
-    Uri URL;
+    String URL;
+
+    public Receipt(Map<String, Object> map)
+    {
+        Date = (String)map.get("timestamp");
+    }
 
     public Receipt() {
     }
@@ -55,11 +73,11 @@ public class Receipt implements Serializable {
         IsFavorite = favorite;
     }
 
-    public Uri getURL() {
+    public String getURL() {
         return URL;
     }
 
-    public void setURL(Uri URL) {
+    public void setURL(String URL) {
         this.URL = URL;
     }
 

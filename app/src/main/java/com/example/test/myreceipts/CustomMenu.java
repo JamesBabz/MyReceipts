@@ -1,17 +1,26 @@
 package com.example.test.myreceipts;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.UserService;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by Jacob Enemark on 07-05-2018.
@@ -71,6 +80,9 @@ public class CustomMenu extends AppCompatActivity {
             case R.id.optDeleteCategory:
                 openDeleteCategoryDialog();
                 return true;
+            case R.id.optRenameCategory:
+                openRenameCategoryDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -89,7 +101,7 @@ public class CustomMenu extends AppCompatActivity {
     }
 
     private void openCreateCategoryDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        Builder builder = new Builder(this);
         builder.setTitle("Create category");
 
         // Set up the input
@@ -123,25 +135,64 @@ public class CustomMenu extends AppCompatActivity {
     }
 
     private void openDeleteCategoryDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        Builder builder = new Builder(this);
         builder.setTitle("Delete category");
 
 
-        // Set up the input
+        // Setup the spinner
         final Spinner spinner = new Spinner(this);
         categoryService.addCategoriesToSpinner(spinner, false, false);
         builder.setView(spinner);
+
+        // Setup the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                if (spinner.getSelectedItem() == null) {
+                    dialog.cancel();
+                    return;
+                }
+                categoryService.deleteCategory(spinner.getSelectedItem().toString().toLowerCase());
+
+                refreshPage();
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void openRenameCategoryDialog() {
+
+
+        // Setup the spinner
+        final Spinner spinner = new Spinner(this);
+        categoryService.addCategoriesToSpinner(spinner, false, false);
+
+        // Setup inputfield
+        final EditText input = new EditText(this);
+
+
+        Builder builder = createRenameView(spinner, input);
+
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                if(spinner.getSelectedItem() == null){
+                if (spinner.getSelectedItem() == null) {
                     dialog.cancel();
                     return;
                 }
-                categoryService.deleteCategory(spinner.getSelectedItem().toString().toLowerCase());
+                categoryService.moveCategory(spinner.getSelectedItem().toString().toLowerCase(), input.getText().toString());
 
                 //Creates category with input text as name
                 refreshPage();
@@ -156,6 +207,50 @@ public class CustomMenu extends AppCompatActivity {
         });
 
         builder.show();
+    }
+
+    private Builder createRenameView(Spinner spinner, EditText input) {
+        Builder builder = new Builder(this);
+        builder.setTitle("Rename category");
+        LinearLayout outerContainer = new LinearLayout(this);
+        outerContainer.setOrientation(LinearLayout.VERTICAL);
+
+        // Create the spinner and label and put it into a container
+        LinearLayout spinnerContainer = createSpinnerContainer(spinner);
+
+        LinearLayout textContainer = createTextContainer(input);
+
+        outerContainer.addView(spinnerContainer);
+        outerContainer.addView(textContainer);
+
+        builder.setView(outerContainer);
+        return builder;
+    }
+
+    private LinearLayout createTextContainer(EditText input) {
+        // Create the renameText and label and put it into a container
+        LinearLayout textContainer = new LinearLayout(this);
+        // Setup the input
+        TextView renameText = new TextView(this);
+        renameText.setText("New name:");
+        input.setHint(" Enter a new name ");
+        // Specify which input type
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        textContainer.addView(renameText);
+        textContainer.addView(input);
+        return textContainer;
+
+    }
+
+
+    private LinearLayout createSpinnerContainer(Spinner spinner) {
+        LinearLayout spinnerContainer = new LinearLayout(this);
+        spinnerContainer.setGravity(Gravity.CENTER);
+        TextView selectCatText = new TextView(this);
+        selectCatText.setText("Select category:");
+        spinnerContainer.addView(selectCatText);
+        spinnerContainer.addView(spinner);
+        return spinnerContainer;
     }
 
     private void refreshPage() {
