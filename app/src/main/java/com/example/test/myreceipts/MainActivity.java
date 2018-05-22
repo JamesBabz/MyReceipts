@@ -57,8 +57,12 @@ public class MainActivity extends CustomMenu {
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ReceiptService receiptService;
+<<<<<<< HEAD
     private UserService mUserService;
     private int x = 0;
+=======
+    private int x;
+>>>>>>> Development
     private List<String> categories = new ArrayList<>();
     private ImageView[] images;
     private CategoryService categoryService;
@@ -79,7 +83,6 @@ public class MainActivity extends CustomMenu {
         receiptService = new ReceiptService();
         mUserService = new UserService();
 
-        images = new ImageView[]{img1, img2, img3, img4};
 
         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
         gridView.setAdapter(buttonAdapter);
@@ -94,6 +97,9 @@ public class MainActivity extends CustomMenu {
     @Override
     protected void onResume() {
         super.onResume();
+        x = 0;
+        images = new ImageView[]{img1, img2, img3, img4};
+        getAllReceiptsForCategory(currentUserId);
         createListeners();
     }
 
