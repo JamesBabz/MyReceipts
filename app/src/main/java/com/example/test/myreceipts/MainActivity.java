@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
+import com.example.test.myreceipts.BLL.UserService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -39,6 +40,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends CustomMenu {
 
     ImageHandler imageHandler;
+
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
     @BindView(R.id.gvShowAll)
@@ -53,14 +55,17 @@ public class MainActivity extends CustomMenu {
     ImageView img3;
     @BindView(R.id.ivRecent4)
     ImageView img4;
+
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ReceiptService receiptService;
+    private UserService mUserService;
     private int x;
     private List<String> categories = new ArrayList<>();
     private ImageView[] images;
     private CategoryService categoryService;
-    private String currentUserId;
+    List<String> receiptUids = new ArrayList<>();
+
 
     public MainActivity() {
         super(false, true);
@@ -74,18 +79,14 @@ public class MainActivity extends CustomMenu {
         ButterKnife.bind(this);
         imageHandler = new ImageHandler();
         receiptService = new ReceiptService();
-
+        mUserService = new UserService();
 
         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
         gridView.setAdapter(buttonAdapter);
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        Bundle extras = getIntent().getExtras();
-        currentUserId = extras.getString("USER");
-
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
-
     }
 
     @Override
@@ -93,7 +94,7 @@ public class MainActivity extends CustomMenu {
         super.onResume();
         x = 0;
         images = new ImageView[]{img1, img2, img3, img4};
-        getAllReceiptsForCategory(currentUserId);
+        getAllReceiptsForCategory(mUserService.getCurrentUser().getUid());
         createListeners();
     }
 
@@ -181,7 +182,7 @@ public class MainActivity extends CustomMenu {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful() && task.getResult().getDocuments().size() >= 1) {
-                    List<String> receiptUids = new ArrayList<>();
+                    receiptUids = new ArrayList<>();
                     TreeMap<Date, String> timeMap = new TreeMap<>();
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
