@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.view.KeyEvent;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -38,17 +39,9 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends CustomMenu {
 
-    ImageView btnCapture;
-    GridView gridView;
-    TextView tvGroupHeader;
     ImageHandler imageHandler;
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
-    Boolean categoryProgress;
-    ImageView img1;
-    ImageView img2;
-    ImageView img3;
-    ImageView img4;
 
     private ReceiptService receiptService;
     private int x = 0;
@@ -60,6 +53,18 @@ public class MainActivity extends CustomMenu {
 
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
+    @BindView(R.id.gvShowAll)
+    GridView gridView;
+    @BindView(R.id.btnCapture)
+    ImageView btnCapture;
+    @BindView(R.id.ivRecent1)
+    ImageView img1;
+    @BindView(R.id.ivRecent2)
+    ImageView img2;
+    @BindView(R.id.ivRecent3)
+    ImageView img3;
+    @BindView(R.id.ivRecent4)
+    ImageView img4;
 
     public MainActivity() {
         super(false, true);
@@ -70,21 +75,14 @@ public class MainActivity extends CustomMenu {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        gridView = findViewById(R.id.gvShowAll);
-        btnCapture = findViewById(R.id.btnCapture);
-        tvGroupHeader = findViewById(R.id.tvGroupHeader);
         ButterKnife.bind(this);
         imageHandler = new ImageHandler();
-        img1 = findViewById(R.id.ivRecent1);
-        img2 = findViewById(R.id.ivRecent2);
-        img3 = findViewById(R.id.ivRecent3);
-        img4 = findViewById(R.id.ivRecent4);
-        images = new ImageView[]{img1, img2, img3, img4};
         receiptService = new ReceiptService();
+
+        images = new ImageView[]{img1, img2, img3, img4};
 
         ButtonAdapter buttonAdapter = new ButtonAdapter(getBaseContext(), categories);
         gridView.setAdapter(buttonAdapter);
-
         mProgressBar.setVisibility(View.INVISIBLE);
 
         Bundle extras = getIntent().getExtras();
@@ -103,11 +101,17 @@ public class MainActivity extends CustomMenu {
         createListeners();
     }
 
+    /**
+     * A method to create all listeners for the class
+     */
     private void createListeners() {
         createCaptureButtonListener();
         createOnCategoryRetrievedListener();
     }
 
+    /**
+     * Sets progressbar for loading categories
+     */
     private void createOnCategoryRetrievedListener() {
         categoryProgressBar();
         categoryService.addCategoriesToButtonAdapter(gridView, mProgressBar);
@@ -122,6 +126,9 @@ public class MainActivity extends CustomMenu {
         });
     }
 
+    /**
+     * Intent that opens the receipt creation activity
+     */
     private void createCaptureButtonListener() {
 
         btnCapture.setOnClickListener(new View.OnClickListener() {
@@ -144,7 +151,9 @@ public class MainActivity extends CustomMenu {
         return super.onKeyDown(keyCode, event);
     }
 
-    //Overrides the main back button
+    /**
+     * Overrides the main back button
+     */
     @Override
     public void onBackPressed() {
         Intent setIntent = new Intent(Intent.ACTION_MAIN);
@@ -153,6 +162,9 @@ public class MainActivity extends CustomMenu {
         startActivity(setIntent);
     }
 
+    /**
+     * sets the visibility of the progressbar
+     */
     private void setCategoryProgress() {
         if (mProgressBar.getVisibility() == View.INVISIBLE) {
             mProgressBar.setVisibility(View.VISIBLE);
@@ -161,7 +173,10 @@ public class MainActivity extends CustomMenu {
         }
     }
 
-    // Get all file uids from database
+    /**
+     * Get all file uids from database
+     * @param userUid
+     */
     private void getAllReceiptsForCategory(final String userUid) {
         // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
         mStore.document("users/" + userUid).collection("allFiles").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -200,7 +215,11 @@ public class MainActivity extends CustomMenu {
         });
     }
 
-    //Gets the image from firebase storage with the file uid and user uid
+    /**
+     * Gets the image from firebase storage with the file uid and user uid
+     * @param userUid
+     * @param fileuids
+     */
     private void getFilesFromStorage(String userUid, final List<String> fileuids) {
 
         //for all file uids in the list, it wil:
@@ -217,6 +236,10 @@ public class MainActivity extends CustomMenu {
         }
     }
 
+    /**
+     * Sets the recent imageviews with the newest receipts.
+     * @param uri
+     */
     private void populateImageViews(final Uri uri) {
         //allows the thread. If this not added, the program will crash on main thread
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
