@@ -24,12 +24,15 @@ public class ListAdapter extends ArrayAdapter<Receipt> {
     Context context;
     ReceiptService receiptService;
 
-    // Array of colors to set in listView
+    /**
+     * Array of colors to set in listView
+     */
     private final int[] colors = {
             Color.parseColor("#ffffff"),
             Color.parseColor("#ffe7b2")
     };
 
+    
     public ListAdapter(Context context, int textViewResourceId,
                        List<Receipt> receipts) {
         super(context, textViewResourceId, receipts);
@@ -38,7 +41,13 @@ public class ListAdapter extends ArrayAdapter<Receipt> {
         receiptService = new ReceiptService();
     }
 
-
+    /**
+     * Sets each view with information about each receipt for the user
+     * @param position
+     * @param v
+     * @param parent
+     * @return v
+     */
     @Override
     public View getView(int position, View v, ViewGroup parent) {
 
