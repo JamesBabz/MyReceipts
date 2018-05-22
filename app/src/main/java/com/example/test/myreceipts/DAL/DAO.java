@@ -153,14 +153,11 @@ public class DAO {
                 .document(storageuid);
 
 
-        // Create fieid so it later can be accessed
-        allFileDocRef.set(exists);
-
         HashMap<String, Object> timeMap = new HashMap<>();
         timeMap.put("timestamp", information.get("timestamp"));
+        // Create fieid so it later can be accessed
+        allFileDocRef.set(timeMap);
 
-        allFileDocRef.collection(FILEUIDS_COLLECTION)
-                .add(timeMap);
     }
 
     /**
