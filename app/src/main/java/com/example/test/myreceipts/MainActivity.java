@@ -95,8 +95,6 @@ public class MainActivity extends CustomMenu {
     protected void onResume() {
         super.onResume();
         createListeners();
-        receiptUids.removeAll()
-        getAllReceiptsForCategory(mUserService.getCurrentUser().getUid());
     }
 
     /**
