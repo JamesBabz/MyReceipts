@@ -38,20 +38,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends CustomMenu {
 
     ImageHandler imageHandler;
-<<<<<<< HEAD
-    private FirebaseFirestore mStore;
-    private StorageReference mStorage;
 
-    private ReceiptService receiptService;
-    private UserService mUserService;
-    private int x = 0;
-    private List<String> categories = new ArrayList<>();
-    private ImageView[] images;
-
-    private CategoryService categoryService;
-
-=======
->>>>>>> Development
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
     @BindView(R.id.gvShowAll)
@@ -66,14 +53,17 @@ public class MainActivity extends CustomMenu {
     ImageView img3;
     @BindView(R.id.ivRecent4)
     ImageView img4;
+
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ReceiptService receiptService;
+    private UserService mUserService;
     private int x = 0;
     private List<String> categories = new ArrayList<>();
     private ImageView[] images;
     private CategoryService categoryService;
-    private String currentUserId;
+    List<String> receiptUids = new ArrayList<>();
+
 
     public MainActivity() {
         super(false, true);
@@ -97,7 +87,7 @@ public class MainActivity extends CustomMenu {
 
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
-        getAllReceiptsForCategory(mUserService.getCurrentUser().getUid());
+
 
     }
 
@@ -105,6 +95,8 @@ public class MainActivity extends CustomMenu {
     protected void onResume() {
         super.onResume();
         createListeners();
+        receiptUids.removeAll()
+        getAllReceiptsForCategory(mUserService.getCurrentUser().getUid());
     }
 
     /**
@@ -191,7 +183,7 @@ public class MainActivity extends CustomMenu {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful() && task.getResult().getDocuments().size() >= 1) {
-                    List<String> receiptUids = new ArrayList<>();
+                    receiptUids = new ArrayList<>();
                     TreeMap<Date, String> timeMap = new TreeMap<>();
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
