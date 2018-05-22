@@ -69,18 +69,28 @@ public class ReceiptActivity extends CustomMenu {
         listeners();
     }
 
+    /**
+     * A method to create all listeners for the class
+     */
     private void listeners() {
         deleteReceipt();
         openImage();
     }
 
+    /**
+     * sets the info for the selected receipt
+     */
     private void setInfo() {
         ImageHandler imageHandler = new ImageHandler();
         tvName.setText("Name: " + receipt.getName());
         tvDate.setText("Date: " + receipt.getDate());
-        ivPicture.setImageBitmap(imageHandler.getImageBitmap(receipt.getURL()));
+        ivPicture.setImageBitmap(imageHandler.getImageBitmap(receipt.getURL())); //Sets bitmap from Firestorage download URL
     }
 
+    /**
+     * Delete receipt and files with a reference to this receipt.
+     * Opens main activity on delete.
+     */
     private void deleteReceipt() {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,11 +108,6 @@ public class ReceiptActivity extends CustomMenu {
     private void deleteToast() {
         Toast toast = Toast.makeText(ReceiptActivity.this, "You deleted the receipt", Toast.LENGTH_LONG);
         toast.show();
-    }
-
-    private void openMainActivity() {
-        Intent intent = new Intent(ReceiptActivity.this, MainActivity.class);
-        startActivity(intent);
     }
 
     private void deleteFile() {
@@ -167,6 +172,15 @@ public class ReceiptActivity extends CustomMenu {
                 });
     }
 
+
+    private void openMainActivity() {
+        Intent intent = new Intent(ReceiptActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Opens image in the build in android photo viewer.
+     */
     private void openImage()
     {
         ivPicture.setOnClickListener(new View.OnClickListener() {
