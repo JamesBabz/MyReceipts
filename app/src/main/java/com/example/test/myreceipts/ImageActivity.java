@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -39,13 +41,10 @@ import butterknife.ButterKnife;
 public class ImageActivity extends CustomMenu {
 
     private final static int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-    String currDate = System.currentTimeMillis() + "";
-
     Bitmap bitmap;
     Bitmap rotatedBitmap;
     File mFile;
     Uri uriSavedImage;
-    List<String> categories = new ArrayList<>();
 
     private String mTimestamp;
     private ImageHandler imgHandler;
@@ -53,6 +52,7 @@ public class ImageActivity extends CustomMenu {
     private CategoryService categoryService;
 
     boolean setFavorite = false;
+    boolean checkForPicture = false;
 
     @BindView(R.id.tvDate)
     TextView date;
@@ -76,15 +76,17 @@ public class ImageActivity extends CustomMenu {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_activity);
-
         ButterKnife.bind(this); // Binds the views with their variable names
 
+        save.setEnabled(false);
         date.setText("Date:");
         receiptService = new ReceiptService();
         categoryService = new CategoryService();
         imgHandler = new ImageHandler();
         mTimestamp = getTimeStamp();
 
+
+        checkForDate();
         createListeners();
     }
 
@@ -190,6 +192,7 @@ public class ImageActivity extends CustomMenu {
 
                 // Uses the imageHandler to set the image
                 ivPicture.setImageURI(imgHandler.bitmapToUriConverter(getBaseContext(), rotatedBitmap));
+                checkForPicture = true;
 
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Canceled...", Toast.LENGTH_LONG).show();
@@ -284,6 +287,33 @@ public class ImageActivity extends CustomMenu {
             }
         });
     }
+
+    /**
+     * Checks if the date is set, if date is not set save button will be disabled.
+     * Date is set when picture is taken.
+     */
+    private void checkForDate()
+    {
+
+            date.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        save.setEnabled(true);
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        save.setEnabled(true);
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    save.setEnabled(true);
+                }
+            });
+        }
+
+
 
     private void createOnCategoryRetrievedListener() {
         categoryService.addCategoriesToSpinner(spinner, false, true);
