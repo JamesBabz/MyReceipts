@@ -175,7 +175,7 @@ public class MainActivity extends CustomMenu {
 
     /**
      * Get all file uids from database
-     * @param userUid
+     * @param userUid the userUID for the user
      */
     private void getAllReceiptsForCategory(final String userUid) {
         // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
@@ -217,8 +217,8 @@ public class MainActivity extends CustomMenu {
 
     /**
      * Gets the image from firebase storage with the file uid and user uid
-     * @param userUid
-     * @param fileuids
+     * @param userUid the userUID for the user
+     * @param fileuids the file ids matching for the users
      */
     private void getFilesFromStorage(String userUid, final List<String> fileuids) {
 
@@ -238,7 +238,8 @@ public class MainActivity extends CustomMenu {
 
     /**
      * Sets the recent imageviews with the newest receipts.
-     * @param uri
+     * Checking strictMode permissions.
+     * @param uri the uri needed for the images
      */
     private void populateImageViews(final Uri uri) {
         //allows the thread. If this not added, the program will crash on main thread
