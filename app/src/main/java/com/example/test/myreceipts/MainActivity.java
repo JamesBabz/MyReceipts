@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
+import com.example.test.myreceipts.BLL.UserService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -44,12 +45,12 @@ public class MainActivity extends CustomMenu {
     private StorageReference mStorage;
 
     private ReceiptService receiptService;
+    private UserService mUserService;
     private int x = 0;
     private List<String> categories = new ArrayList<>();
     private ImageView[] images;
 
     private CategoryService categoryService;
-    private String currentUserId;
 
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
@@ -78,6 +79,7 @@ public class MainActivity extends CustomMenu {
         ButterKnife.bind(this);
         imageHandler = new ImageHandler();
         receiptService = new ReceiptService();
+        mUserService = new UserService();
 
         images = new ImageView[]{img1, img2, img3, img4};
 
@@ -85,13 +87,9 @@ public class MainActivity extends CustomMenu {
         gridView.setAdapter(buttonAdapter);
         mProgressBar.setVisibility(View.INVISIBLE);
 
-        Bundle extras = getIntent().getExtras();
-        currentUserId = extras.getString("USER");
-
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
-
-        getAllReceiptsForCategory(currentUserId);
+        getAllReceiptsForCategory(mUserService.getCurrentUser().getUid());
 
     }
 
