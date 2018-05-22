@@ -122,7 +122,10 @@ public class CategoryActivity extends CustomMenu {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     List<String> fileUids = new ArrayList<>();
-                    if (task.getResult().size() <= 1) {
+                    //TODO TEST THIS ASAP
+                    if(((categoryName.equalsIgnoreCase("favorites") ||categoryName.equalsIgnoreCase("unassigned"))
+                            && task.getResult().size() == 1)
+                            || task.getResult().size() == 0){
                         if (categoryName.equalsIgnoreCase("favorites")) {
                             createTextView(llListContainer, "No images in category", "Add images to favorites by clicking the star icon");
                         } else {
