@@ -5,17 +5,11 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 
 import com.example.test.myreceipts.DAL.DAO;
-import com.example.test.myreceipts.Entity.Receipt;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,12 +26,25 @@ public class ReceiptService {
         imgHandler = new ImageHandler();
     }
 
+    /**
+     * Saves the receipt
+     *
+     * @param context     The context used by the bitmap converter
+     * @param bitmap      The bitmap of the image to save
+     * @param information All the information given to the image
+     */
     public void saveReceipt(Context context, Bitmap bitmap, Map<String, Object> information) {
         Uri uri = (imgHandler.bitmapToUriConverter(context, bitmap));
         dao.saveReceipt(context, uri, information);
     }
 
-    public Date convertDate(String stringDate){
+    /**
+     * Formats the date
+     *
+     * @param stringDate The date as a string
+     * @return The formatted date
+     */
+    public Date convertDate(String stringDate) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
         try {

@@ -1,17 +1,18 @@
 package com.example.test.myreceipts;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.ImageHandler;
@@ -41,12 +42,12 @@ public class CategoryActivity extends CustomMenu {
     ListView listViewCategories;
     ListAdapter listAdapter;
     List<Receipt> returnList = new ArrayList<>();
+    TextView categoryHeadline;
+    LinearLayout llListContainer;
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ImageHandler imageHandler = new ImageHandler();
     private String categoryName;
-    TextView categoryHeadline;
-    LinearLayout llListContainer;
 
     public CategoryActivity() {
         super(true, true);
@@ -63,8 +64,10 @@ public class CategoryActivity extends CustomMenu {
         userService = new UserService();
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
+
         listViewCategories = findViewById(R.id.listViewCategories);
         categoryHeadline = findViewById(R.id.tvGroupName);
+
         final String userUid = userService.getCurrentUser().getUid();
         categoryName = getIntent().getExtras().getString("categoryName");
         categoryHeadline.setText(categoryName.toUpperCase());
@@ -80,6 +83,7 @@ public class CategoryActivity extends CustomMenu {
 
     /**
      * start a new thread to handle the calls for Firebase, to reduce the work on main thread
+     *
      * @param userUid the UID for current user
      * @return a thread
      */
@@ -106,7 +110,8 @@ public class CategoryActivity extends CustomMenu {
 
     /**
      * Get all file uids from database, in the selected category
-     * @param userUid UID for current user
+     *
+     * @param userUid  UID for current user
      * @param category gets all the file UIDs in database for this category
      */
     public void getAllReceiptsForCategory(final String userUid, final String category) {
@@ -117,10 +122,10 @@ public class CategoryActivity extends CustomMenu {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     List<String> fileUids = new ArrayList<>();
-                    if(task.getResult().size() <= 1){
-                        if(categoryName.equalsIgnoreCase("favorites")){
+                    if (task.getResult().size() <= 1) {
+                        if (categoryName.equalsIgnoreCase("favorites")) {
                             createTextView(llListContainer, "No images in category", "Add images to favorites by clicking the star icon");
-                        }else{
+                        } else {
                             createTextView(llListContainer, "No images in category", "Add images to categories when you take them");
                         }
                         return;
@@ -141,22 +146,27 @@ public class CategoryActivity extends CustomMenu {
     }
 
     /**
-     * Create a textview in parent
-     * @param parent the view that the text has to bee shown in
-     * @param text Array
+     * Create a textview in a specific parent
+     *
+     * @param parent The parent view for the text
+     * @param text   One or more texts to be shown
      */
     private void createTextView(ViewGroup parent, String... text) {
         parent.removeAllViews();
-        for(int i = 0; i< text.length; i++){
+        for (int i = 0; i < text.length; i++) {
             TextView tvText = new TextView(this);
             tvText.setText(text[i]);
+            tvText.setGravity(Gravity.CENTER);
+            tvText.setBackgroundColor(Color.LTGRAY);
+            tvText.setPadding(0,10,0,10);
             parent.addView(tvText);
         }
     }
 
     /**
      * Gets the image from firebase storage with the file uid and user uid
-     * @param userUid UID for current user
+     *
+     * @param userUid  UID for current user
      * @param fileuids all the File UIDs for the category
      */
     private void getFilesFromStorage(String userUid, List<String> fileuids) {
@@ -213,6 +223,7 @@ public class CategoryActivity extends CustomMenu {
 
     /**
      * Opens ReceiptActivity with information about the selected receipt
+     *
      * @param entry a Receipt entity
      */
     private void openReceiptView(Receipt entry) {

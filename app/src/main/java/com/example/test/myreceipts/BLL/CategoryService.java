@@ -1,8 +1,5 @@
 package com.example.test.myreceipts.BLL;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -15,7 +12,6 @@ import com.example.test.myreceipts.DAL.DAO;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;

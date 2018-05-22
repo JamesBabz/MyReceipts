@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.view.KeyEvent;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.ImageHandler;
@@ -26,7 +24,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -40,17 +37,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends CustomMenu {
 
     ImageHandler imageHandler;
-    private FirebaseFirestore mStore;
-    private StorageReference mStorage;
-
-    private ReceiptService receiptService;
-    private int x = 0;
-    private List<String> categories = new ArrayList<>();
-    private ImageView[] images;
-
-    private CategoryService categoryService;
-    private String currentUserId;
-
     @BindView(R.id.categoryRefresh)
     ProgressBar mProgressBar;
     @BindView(R.id.gvShowAll)
@@ -65,6 +51,14 @@ public class MainActivity extends CustomMenu {
     ImageView img3;
     @BindView(R.id.ivRecent4)
     ImageView img4;
+    private FirebaseFirestore mStore;
+    private StorageReference mStorage;
+    private ReceiptService receiptService;
+    private int x = 0;
+    private List<String> categories = new ArrayList<>();
+    private ImageView[] images;
+    private CategoryService categoryService;
+    private String currentUserId;
 
     public MainActivity() {
         super(false, true);
@@ -175,6 +169,7 @@ public class MainActivity extends CustomMenu {
 
     /**
      * Get all file uids from database
+     *
      * @param userUid the userUID for the user
      */
     private void getAllReceiptsForCategory(final String userUid) {
@@ -190,8 +185,6 @@ public class MainActivity extends CustomMenu {
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         if (!document.getId().equals("0")) {
 
-                            Log.d("receiptData", document.getId());
-                            Log.d("receiptData", document.getData().get("timestamp").toString());
                             String stringDate = document.getData().get("timestamp").toString();
                             timeMap.put(receiptService.convertDate(stringDate), document.getId());
                         }
@@ -217,7 +210,8 @@ public class MainActivity extends CustomMenu {
 
     /**
      * Gets the image from firebase storage with the file uid and user uid
-     * @param userUid the userUID for the user
+     *
+     * @param userUid  the userUID for the user
      * @param fileuids the file ids matching for the users
      */
     private void getFilesFromStorage(String userUid, final List<String> fileuids) {
@@ -239,6 +233,7 @@ public class MainActivity extends CustomMenu {
     /**
      * Sets the recent imageviews with the newest receipts.
      * Checking strictMode permissions.
+     *
      * @param uri the uri needed for the images
      */
     private void populateImageViews(final Uri uri) {
