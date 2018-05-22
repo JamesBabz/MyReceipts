@@ -35,8 +35,6 @@ public class ProfileActivity extends CustomMenu {
 
     private EditText txtFirstPassword;
     private Button btnResetpassword;
-    private Button btnUpdateUser;
-private boolean isThereAnUser = true;
      private String currentUserId;
 
      private UserService userService;
@@ -54,7 +52,6 @@ private boolean isThereAnUser = true;
         txtLastname = findViewById(R.id.txtProfileLastname);
         btnResetpassword = findViewById(R.id.btnResetPassword);
         txtFirstPassword = findViewById(R.id.txtFirstNewPassword);
-        btnUpdateUser = findViewById(R.id.btnUpdateProfile);
         userService = new UserService();
 
         Bundle extras = getIntent().getExtras();
@@ -65,18 +62,19 @@ private boolean isThereAnUser = true;
     }
 
 
-
-
+    // Sets the user information
+    //Waits to set the information when the callback has received the data from the service.
     private void fillOutTextViews()
     {
         txtUsername.setText(userService.getCurrentUser().getEmail());
+
+        //Makes the textView non editable or clickable
         txtUsername.setTag(txtUsername.getKeyListener());
         txtUsername.setKeyListener(null);
         Context context = this;
        userService.getUser(currentUserId, context, new Callback() {
            @Override
            public void act(User model) {
-               isThereAnUser = true;
                txtFirstname.setText(model.getFirstname());
                txtLastname.setText(model.getLastname());
            }
@@ -85,6 +83,8 @@ private boolean isThereAnUser = true;
 
     }
 
+    //creates a new user entity with the properties from the textview, and sends it to the service
+    //when the task is completed, a toast will show
     private void updateUser(){
         User updatedUser = new User(currentUserId,txtUsername.getText().toString(), txtFirstname.getText().toString(), txtLastname.getText().toString());
       userService.updateUser(updatedUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
@@ -100,6 +100,7 @@ private boolean isThereAnUser = true;
         updateUser();
     }
 
+    //sends the new password to the service
     private void updateUserPassword(){
         Context context = this;
         String password = txtFirstPassword.getText().toString();
