@@ -29,7 +29,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import butterknife.BindView;
@@ -85,6 +87,7 @@ public class MainActivity extends CustomMenu {
 
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
+
     }
 
     @Override
@@ -248,7 +251,24 @@ public class MainActivity extends CustomMenu {
             @Override
             public void run() {
                 // the 4 image views are a added to a [], each time it gets through the loop, it will get the next imageview to set a new image.
+              //  images[x].setImageBitmap(imageHandler.getImageBitmap(uri.toString()));
                 images[x].setImageBitmap(imageHandler.getImageBitmap(uri.toString()));
+                HashMap<ImageView, String> map = new HashMap<>();
+                map.put(images[x], uri.toString());
+
+                for(final Map.Entry<ImageView, String> entry : map.entrySet()) {
+                   entry.getKey().setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View view) {
+                           Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+                           Uri data = Uri.parse(entry.getValue());
+                           intent.setDataAndType(data, "image/*");
+                           startActivity(intent);
+
+                       }
+                   });
+
+                }
                 x++;
             }
         });

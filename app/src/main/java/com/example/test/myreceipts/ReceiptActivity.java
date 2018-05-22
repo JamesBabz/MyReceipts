@@ -143,11 +143,7 @@ public class ReceiptActivity extends CustomMenu {
     private void deleteFile() {
         StorageReference storageRef = mStorage;
         StorageReference deleteRef = storageRef.child("receipts").child(mUserService.getCurrentUser().getUid()).child(receipt.getId());
-        deleteRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-            }
-        });
+        deleteRef.delete();
     }
 
     /**
