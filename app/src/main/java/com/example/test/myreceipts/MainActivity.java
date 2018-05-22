@@ -87,6 +87,10 @@ public class MainActivity extends CustomMenu {
 
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
+<<<<<<< HEAD
+=======
+
+>>>>>>> d02d035cb7050877ed1c0b2abd84deed74269476
     }
 
     @Override
