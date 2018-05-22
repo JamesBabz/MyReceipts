@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
+
 import com.example.test.myreceipts.BLL.ImageHandler;
 import com.example.test.myreceipts.BLL.ReceiptService;
 import com.example.test.myreceipts.BLL.UserService;
@@ -40,6 +42,8 @@ public class CategoryActivity extends CustomMenu {
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ImageHandler imageHandler = new ImageHandler();
+    private String categoryName;
+    TextView categoryHeadline;
 
     public CategoryActivity() {
         super(true, true);
@@ -56,7 +60,10 @@ public class CategoryActivity extends CustomMenu {
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
         listViewCategories = findViewById(R.id.listViewCategories);
+        categoryHeadline = findViewById(R.id.tvGroupName);
         final String userUid = userService.getCurrentUser().getUid();
+        categoryName = getIntent().getExtras().getString("categoryName");
+        categoryHeadline.setText(categoryName.toUpperCase());
 
         createSpinner();
         Thread thread = getFilesFromFirebase(userUid);
@@ -74,7 +81,7 @@ public class CategoryActivity extends CustomMenu {
         return new Thread() {
                 @Override
                 public void run() {
-                    getAllReceiptsForCategory(userUid, getIntent().getExtras().getString("categoryName"));
+                    getAllReceiptsForCategory(userUid, categoryName);
                 }
             };
     }
