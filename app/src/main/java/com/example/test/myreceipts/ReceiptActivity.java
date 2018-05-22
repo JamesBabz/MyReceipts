@@ -2,8 +2,10 @@ package com.example.test.myreceipts;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -19,8 +21,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.TreeMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,11 +89,27 @@ public class ReceiptActivity extends CustomMenu {
      * sets the info for the selected receipt
      */
     private void setInfo() {
+        final String[] stringDate = new String[1];
+        // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
+        db.document("users/" + mUserService.getCurrentUser().getUid()).collection("allFiles").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful() && task.getResult().getDocuments().size() >= 1) {
+
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (!document.getId().equals("0")) {
+                            stringDate[0] = document.getData().get("timestamp").toString();
+                        }
+                    }
+
+
         ImageHandler imageHandler = new ImageHandler();
         tvName.setText("Name: " + receipt.getName());
-        tvDate.setText("Date: " + receipt.getDate());
+        tvDate.setText("Date: " + stringDate[0]);
         ivPicture.setImageBitmap(imageHandler.getImageBitmap(receipt.getURL())); //Sets bitmap from Firestorage download URL
-    }
+
+    }}});}
 
     /**
      * Delete receipt and files with a reference to this receipt.
@@ -209,4 +233,6 @@ public class ReceiptActivity extends CustomMenu {
             }
         });
     }
+
+
 }
