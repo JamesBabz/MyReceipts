@@ -38,7 +38,6 @@ import java.util.List;
 public class CategoryActivity extends CustomMenu {
     ReceiptService receiptService;
     UserService userService;
-    Spinner spinner;
     ListView listViewCategories;
     ListAdapter listAdapter;
     List<Receipt> returnList = new ArrayList<>();
@@ -79,7 +78,11 @@ public class CategoryActivity extends CustomMenu {
 
     }
 
-    //start a new thread to handle the calls for Firebase, to reduce the work on main thread
+    /**
+     * start a new thread to handle the calls for Firebase, to reduce the work on main thread
+     * @param userUid the UID for current user
+     * @return a thread
+     */
     @NonNull
     private Thread getFilesFromFirebase(final String userUid) {
         return new Thread() {
@@ -90,7 +93,9 @@ public class CategoryActivity extends CustomMenu {
         };
     }
 
-    //Checks for internet connection and permission
+    /**
+     * Checks for internet connection and permission
+     */
     private void checkStrictMode() {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy =
@@ -99,7 +104,11 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    // Get all file uids from database, in the selected category
+    /**
+     * Get all file uids from database, in the selected category
+     * @param userUid UID for current user
+     * @param category gets all the file UIDs in database for this category
+     */
     public void getAllReceiptsForCategory(final String userUid, final String category) {
 
         // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
@@ -131,6 +140,11 @@ public class CategoryActivity extends CustomMenu {
 
     }
 
+    /**
+     * Create a textview in parent
+     * @param parent the view that the text has to bee shown in
+     * @param text Array
+     */
     private void createTextView(ViewGroup parent, String... text) {
         parent.removeAllViews();
         for(int i = 0; i< text.length; i++){
@@ -140,7 +154,11 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    //Gets the image from firebase storage with the file uid and user uid
+    /**
+     * Gets the image from firebase storage with the file uid and user uid
+     * @param userUid UID for current user
+     * @param fileuids all the File UIDs for the category
+     */
     private void getFilesFromStorage(String userUid, List<String> fileuids) {
 
         //for all file uids in the list, it wil:
@@ -172,13 +190,17 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    //Creates the listadapter to set the listview
+    /**
+     * Creates the listadapter to set the listview
+     */
     private void setList() {
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
         listViewCategories.setAdapter(listAdapter);
     }
 
-    //Listens on witch item is clicked
+    /**
+     * Listens on witch item is clicked
+     */
     private void addListenerOnList() {
         listViewCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -189,7 +211,10 @@ public class CategoryActivity extends CustomMenu {
         });
     }
 
-    //Opens ReceiptActivity with information about the selected receipt
+    /**
+     * Opens ReceiptActivity with information about the selected receipt
+     * @param entry a Receipt entity
+     */
     private void openReceiptView(Receipt entry) {
         //Creates a new entity, with the only needed data for next view
         Receipt receiptForNextView = new Receipt();
