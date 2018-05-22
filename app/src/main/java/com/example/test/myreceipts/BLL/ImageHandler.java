@@ -27,8 +27,8 @@ public class ImageHandler {
 
     /**
      * Gets the bitmap and rotate it to the given angle
-     * @param source
-     * @param angle
+     * @param source the bitmap source
+     * @param angle the angle to rotate
      * @return
      */
     public static Bitmap rotateImage(Bitmap source, float angle) {
@@ -41,8 +41,8 @@ public class ImageHandler {
     /**
      *Returns a bitmap as an URI
      * Sets quality of new file
-     * @param context
-     * @param mBitmap
+     * @param context the given context
+     * @param mBitmap the bitmap to convert
      * @return
      */
     public Uri bitmapToUriConverter(Context context, Bitmap mBitmap) {
@@ -73,7 +73,7 @@ public class ImageHandler {
 
     /**
      * Uses bitmap factory to create a bitmap from a given URL
-     * @param url
+     * @param url the url to get bitmap from
      * @return
      */
     public Bitmap getImageBitmap(String url) {
