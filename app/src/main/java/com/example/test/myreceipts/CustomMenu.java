@@ -22,13 +22,11 @@ import com.example.test.myreceipts.BLL.UserService;
 
 public class CustomMenu extends AppCompatActivity {
 
-    private UserService mUserService;
-    private CategoryService categoryService;
-
-    private String m_Text = "";
-
     boolean backBtn;
     boolean profileMenuItem;
+    private UserService mUserService;
+    private CategoryService categoryService;
+    private String m_Text = "";
 
 
     public CustomMenu(Boolean backBtn, Boolean profileMenuItem) {

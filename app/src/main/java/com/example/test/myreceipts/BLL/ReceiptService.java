@@ -28,8 +28,9 @@ public class ReceiptService {
 
     /**
      * Saves the receipt
-     * @param context The context used by the bitmap converter
-     * @param bitmap The bitmap of the image to save
+     *
+     * @param context     The context used by the bitmap converter
+     * @param bitmap      The bitmap of the image to save
      * @param information All the information given to the image
      */
     public void saveReceipt(Context context, Bitmap bitmap, Map<String, Object> information) {
@@ -39,6 +40,7 @@ public class ReceiptService {
 
     /**
      * Formats the date
+     *
      * @param stringDate The date as a string
      * @return The formatted date
      */

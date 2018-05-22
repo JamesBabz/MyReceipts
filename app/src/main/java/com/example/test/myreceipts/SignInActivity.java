@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.test.myreceipts.BLL.UserService;
 import com.example.test.myreceipts.Entity.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,17 +31,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 
 public class SignInActivity extends AppCompatActivity {
 
-    private UserService userService;
-
-    private TextView headLine;
-    private EditText mEmailField;
-    private EditText mPasswordField;
     Button btnSignIn;
     Button btnSignUp;
     Button btnCancel;
     ProgressBar progressBar;
-
+    private UserService userService;
+    private TextView headLine;
+    private EditText mEmailField;
+    private EditText mPasswordField;
     private FirebaseAuth firebaseAuth; // connection for firebase authentication
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,34 +75,34 @@ public class SignInActivity extends AppCompatActivity {
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         try {
-                Log.d("UserLogin", currentUser.getUid());
-                startNewActivity(currentUser.getUid());
+            startNewActivity(currentUser.getUid());
 
         } catch (@NonNull Exception exception) {
-            Log.d("UserLogin", "fail");
+            Log.d("Error", "Error: " + exception.getMessage());
         }
     }
     // [END on_start_check_user]
 
     /**
      * Calls the the method to create a account with the given properties
+     *
      * @param v to make it at click function in XML
      */
-    public void btnCreateAccount(View v){
+    public void btnCreateAccount(View v) {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
-        createAccount(email, password );
+        createAccount(email, password);
     }
 
     /**
      * creates an auth user and an user in database
-     * @param email for the user
+     *
+     * @param email    for the user
      * @param password for the user
      */
     private void createAccount(String email, String password) {
         // if the validator is not true, it will do nothing
-        if (!validateForm())
-        {
+        if (!validateForm()) {
             return;
         }
 
@@ -118,7 +118,7 @@ public class SignInActivity extends AppCompatActivity {
                             // Sign in success, create an user for the account, and start new activity.
                             FirebaseUser user = userService.getCurrentUser();
                             //create a new user to make the update
-                            User newUser = new User(user.getUid(),user.getEmail(), "", "");
+                            User newUser = new User(user.getUid(), user.getEmail(), "", "");
                             // creates the user in database
                             userService.updateUser(newUser).addOnCompleteListener((new OnCompleteListener<DocumentSnapshot>() {
                                 //when the user has been created in database
@@ -146,22 +146,23 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * calls the signIn method with the given properties
+     *
      * @param v to make it at click function in XML
      */
-    public void btnSignIn(View v){
+    public void btnSignIn(View v) {
         signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
 
     }
 
     /**
      * sign in and checks in firebase auth service if user exists
-     * @param email for the user
+     *
+     * @param email    for the user
      * @param password for the user
      */
     private void signIn(String email, String password) {
         // if the validator is not true, it will do nothing
-        if (!validateForm())
-        {
+        if (!validateForm()) {
             return;
         }
 
@@ -193,6 +194,7 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * Validate the textfields. If one og both are empty, the field will set the error message.
+     *
      * @return a boolean . If the form is correctly or not
      */
     private boolean validateForm() {
@@ -248,9 +250,10 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * starts mainActivity
+     *
      * @param userUID sending to the new view in intent
      */
-    private void startNewActivity(String userUID){
+    private void startNewActivity(String userUID) {
         Intent intent = new Intent(SignInActivity.this, MainActivity.class);
         intent.putExtra("USER", userUID);
         startActivity(intent);
@@ -259,7 +262,7 @@ public class SignInActivity extends AppCompatActivity {
     /**
      * If new account is selected the view updates
      */
-    private void showCreateAccountView(){
+    private void showCreateAccountView() {
         headLine.setText("Create account");
         mPasswordField.setText("");
         mEmailField.setText("");
@@ -271,6 +274,7 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * sets the signIn view again
+     *
      * @param v to make it at click function in XML
      */
     public void btnCancelCreate(View v) {
@@ -284,12 +288,13 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * overrides the main back button
+     *
      * @param keyCode
      * @param event
      * @return
      */
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
                 && keyCode == KeyEvent.KEYCODE_BACK
                 && event.getRepeatCount() == 0) {

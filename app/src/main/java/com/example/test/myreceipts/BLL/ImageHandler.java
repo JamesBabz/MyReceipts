@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -17,8 +16,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by James on 07-05-2018.
  */
@@ -27,8 +24,9 @@ public class ImageHandler {
 
     /**
      * Gets the bitmap and rotate it to the given angle
+     *
      * @param source the bitmap source
-     * @param angle the angle to rotate
+     * @param angle  the angle to rotate
      * @return
      */
     public static Bitmap rotateImage(Bitmap source, float angle) {
@@ -39,8 +37,9 @@ public class ImageHandler {
     }
 
     /**
-     *Returns a bitmap as an URI
+     * Returns a bitmap as an URI
      * Sets quality of new file
+     *
      * @param context the given context
      * @param mBitmap the bitmap to convert
      * @return
@@ -66,13 +65,14 @@ public class ImageHandler {
             uri = Uri.fromFile(f);
 
         } catch (Exception e) {
-            Log.e("Your Error Message", e.getMessage());
+            Log.e("Error: ", e.getMessage());
         }
         return uri;
     }
 
     /**
      * Uses bitmap factory to create a bitmap from a given URL
+     *
      * @param url the url to get bitmap from
      * @return
      */
