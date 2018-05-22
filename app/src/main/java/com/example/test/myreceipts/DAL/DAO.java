@@ -3,10 +3,8 @@ package com.example.test.myreceipts.DAL;
 import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.example.test.myreceipts.Entity.Receipt;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -20,9 +18,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,23 +32,18 @@ public class DAO {
 
 
     private static final String ERROR_TAG = "Error"; // an error tag for logging
-
-    private FirebaseFirestore mStore;
-    private StorageReference mStorage;
-
     // The static names of collections and documents in our firebase
     private static final String RECEIPTS_COLLECTION = "receipts";
     private static final String USERS_COLLECTION = "users";
     private static final String CATEGORIES_COLLECTION = "categories";
     private static final String FILEUIDS_COLLECTION = "fileuids";
     private static final String ALLFILES_COLLECTION = "allFiles";
-
     private static final String FAVORITES_DOCUMENT = "favorites";
     private static final String UNASSIGNED_DOCUMENT = "unassigned";
-
-    CollectionReference catRef;
-
     final HashMap<String, Boolean> exists = new HashMap<>();
+    CollectionReference catRef;
+    private FirebaseFirestore mStore;
+    private StorageReference mStorage;
     private String user;
 
     public DAO() {
@@ -94,7 +85,7 @@ public class DAO {
                     addToFavoritesInDB(uuid);
                 }
 
-                Toast.makeText(context, "The receipt is saved successfully", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "The receipt was saved successfully", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -102,7 +93,7 @@ public class DAO {
     /**
      * Add to "favorites" in firebase
      *
-     * @param storageuid  The reference of the image to the firestore
+     * @param storageuid The reference of the image to the firestore
      */
     private void addToFavoritesInDB(String storageuid) {
         catRef.document(FAVORITES_DOCUMENT)

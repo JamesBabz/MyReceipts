@@ -1,17 +1,18 @@
 package com.example.test.myreceipts;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.test.myreceipts.BLL.ImageHandler;
@@ -38,16 +39,15 @@ import java.util.List;
 public class CategoryActivity extends CustomMenu {
     ReceiptService receiptService;
     UserService userService;
-    Spinner spinner;
     ListView listViewCategories;
     ListAdapter listAdapter;
     List<Receipt> returnList = new ArrayList<>();
+    TextView categoryHeadline;
+    LinearLayout llListContainer;
     private FirebaseFirestore mStore;
     private StorageReference mStorage;
     private ImageHandler imageHandler = new ImageHandler();
     private String categoryName;
-    TextView categoryHeadline;
-    LinearLayout llListContainer;
 
     public CategoryActivity() {
         super(true, true);
@@ -64,8 +64,10 @@ public class CategoryActivity extends CustomMenu {
         userService = new UserService();
         mStore = FirebaseFirestore.getInstance();
         mStorage = FirebaseStorage.getInstance().getReference();
+
         listViewCategories = findViewById(R.id.listViewCategories);
         categoryHeadline = findViewById(R.id.tvGroupName);
+
         final String userUid = userService.getCurrentUser().getUid();
         categoryName = getIntent().getExtras().getString("categoryName");
         categoryHeadline.setText(categoryName.toUpperCase());
@@ -79,7 +81,12 @@ public class CategoryActivity extends CustomMenu {
 
     }
 
-    //start a new thread to handle the calls for Firebase, to reduce the work on main thread
+    /**
+     * start a new thread to handle the calls for Firebase, to reduce the work on main thread
+     *
+     * @param userUid the UID for current user
+     * @return a thread
+     */
     @NonNull
     private Thread getFilesFromFirebase(final String userUid) {
         return new Thread() {
@@ -90,7 +97,9 @@ public class CategoryActivity extends CustomMenu {
         };
     }
 
-    //Checks for internet connection and permission
+    /**
+     * Checks for internet connection and permission
+     */
     private void checkStrictMode() {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy =
@@ -99,7 +108,12 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    // Get all file uids from database, in the selected category
+    /**
+     * Get all file uids from database, in the selected category
+     *
+     * @param userUid  UID for current user
+     * @param category gets all the file UIDs in database for this category
+     */
     public void getAllReceiptsForCategory(final String userUid, final String category) {
 
         // get the reference to to the file uid, adds it to a list, and calls the method for getting the file in storage
@@ -108,10 +122,10 @@ public class CategoryActivity extends CustomMenu {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     List<String> fileUids = new ArrayList<>();
-                    if(task.getResult().size() <= 1){
-                        if(categoryName.equalsIgnoreCase("favorites")){
+                    if (task.getResult().size() <= 1) {
+                        if (categoryName.equalsIgnoreCase("favorites")) {
                             createTextView(llListContainer, "No images in category", "Add images to favorites by clicking the star icon");
-                        }else{
+                        } else {
                             createTextView(llListContainer, "No images in category", "Add images to categories when you take them");
                         }
                         return;
@@ -131,16 +145,30 @@ public class CategoryActivity extends CustomMenu {
 
     }
 
+    /**
+     * Create a textview in a specific parent
+     *
+     * @param parent The parent view for the text
+     * @param text   One or more texts to be shown
+     */
     private void createTextView(ViewGroup parent, String... text) {
         parent.removeAllViews();
-        for(int i = 0; i< text.length; i++){
+        for (int i = 0; i < text.length; i++) {
             TextView tvText = new TextView(this);
             tvText.setText(text[i]);
+            tvText.setGravity(Gravity.CENTER);
+            tvText.setBackgroundColor(Color.LTGRAY);
+            tvText.setPadding(0,10,0,10);
             parent.addView(tvText);
         }
     }
 
-    //Gets the image from firebase storage with the file uid and user uid
+    /**
+     * Gets the image from firebase storage with the file uid and user uid
+     *
+     * @param userUid  UID for current user
+     * @param fileuids all the File UIDs for the category
+     */
     private void getFilesFromStorage(String userUid, List<String> fileuids) {
 
         //for all file uids in the list, it wil:
@@ -172,13 +200,17 @@ public class CategoryActivity extends CustomMenu {
         }
     }
 
-    //Creates the listadapter to set the listview
+    /**
+     * Creates the listadapter to set the listview
+     */
     private void setList() {
         listAdapter = new ListAdapter(this, R.layout.cell_extended, returnList);
         listViewCategories.setAdapter(listAdapter);
     }
 
-    //Listens on witch item is clicked
+    /**
+     * Listens on witch item is clicked
+     */
     private void addListenerOnList() {
         listViewCategories.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -189,7 +221,11 @@ public class CategoryActivity extends CustomMenu {
         });
     }
 
-    //Opens ReceiptActivity with information about the selected receipt
+    /**
+     * Opens ReceiptActivity with information about the selected receipt
+     *
+     * @param entry a Receipt entity
+     */
     private void openReceiptView(Receipt entry) {
         //Creates a new entity, with the only needed data for next view
         Receipt receiptForNextView = new Receipt();

@@ -1,14 +1,11 @@
 package com.example.test.myreceipts;
 
-import android.app.AlertDialog;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,6 +21,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -32,21 +30,23 @@ import butterknife.ButterKnife;
  */
 
 
-
 public class ReceiptActivity extends CustomMenu {
 
-    private FirebaseFirestore db;
-    private StorageReference mStorage;
+    private static final String ERROR_TAG = "Error"; // an error tag for logging
+    private static final String SUCCESS_TAG = "Success"; // a success tag for logging
+
     UserService mUserService;
     Receipt receipt;
-
     @BindView(R.id.tvName)
     TextView tvName;
     @BindView(R.id.ivPicture)
     ImageView ivPicture;
     @BindView(R.id.deleteButton)
     ImageButton deleteButton;
-    @BindView(R.id.tvDate) TextView tvDate;
+    @BindView(R.id.tvDate)
+    TextView tvDate;
+    private FirebaseFirestore db;
+    private StorageReference mStorage;
 
     public ReceiptActivity() {
         super(true, true);
@@ -105,15 +105,20 @@ public class ReceiptActivity extends CustomMenu {
         });
     }
 
+    /**
+     * Creates a toast on delete
+     */
     private void deleteToast() {
         Toast toast = Toast.makeText(ReceiptActivity.this, "You deleted the receipt", Toast.LENGTH_LONG);
         toast.show();
     }
 
+    /**
+     * Deletes the file
+     */
     private void deleteFile() {
         StorageReference storageRef = mStorage;
         StorageReference deleteRef = storageRef.child("receipts").child(mUserService.getCurrentUser().getUid()).child(receipt.getId());
-        Log.d("HELLO", deleteRef.toString());
         deleteRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -121,58 +126,70 @@ public class ReceiptActivity extends CustomMenu {
         });
     }
 
+    /**
+     * Deletes the category
+     */
     private void deleteCategory() {
         db.collection("users").document(mUserService.getCurrentUser().getUid()).collection("categories").document("unassigned").collection("fileuids").document(receipt.getId())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("HELLO", "Receipt successfully deleted!");
+                        Log.d(SUCCESS_TAG, "Receipt successfully deleted!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("HELLO", "Error deleting document", e);
+                        Log.w(ERROR_TAG, "Error deleting document", e);
                     }
                 });
     }
 
+    /**
+     * Deletes the file from "all files"
+     */
     private void deleteFromAllFiles() {
         db.collection("users").document(mUserService.getCurrentUser().getUid()).collection("allFiles").document(receipt.getId())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("HELLO", "Favorite successfully deleted!");
+                        Log.d(SUCCESS_TAG, "Favorite successfully deleted!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("HELLO", "Error deleting document", e);
+                        Log.w(ERROR_TAG, "Error deleting document", e);
                     }
                 });
     }
 
+    /**
+     * Deletes from "favorites"
+     */
     private void deleteFavorite() {
         db.collection("users").document(mUserService.getCurrentUser().getUid()).collection("categories").document("favorites").collection("fileuids").document(receipt.getId())
                 .delete()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Log.d("HELLO", "Favorite successfully deleted!");
+                        Log.d(SUCCESS_TAG, "Favorite successfully deleted!");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.w("HELLO", "Error deleting document", e);
+                        Log.w(ERROR_TAG, "Error deleting document", e);
                     }
                 });
     }
 
 
+    /**
+     * Opens the main activity
+     */
     private void openMainActivity() {
         Intent intent = new Intent(ReceiptActivity.this, MainActivity.class);
         startActivity(intent);
@@ -181,8 +198,7 @@ public class ReceiptActivity extends CustomMenu {
     /**
      * Opens image in the build in android photo viewer.
      */
-    private void openImage()
-    {
+    private void openImage() {
         ivPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

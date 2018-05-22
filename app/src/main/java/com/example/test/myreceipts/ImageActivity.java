@@ -24,11 +24,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -45,15 +43,8 @@ public class ImageActivity extends CustomMenu {
     Bitmap rotatedBitmap;
     File mFile;
     Uri uriSavedImage;
-
-    private String mTimestamp;
-    private ImageHandler imgHandler;
-    private ReceiptService receiptService;
-    private CategoryService categoryService;
-
     boolean setFavorite = false;
     boolean checkForPicture = false;
-
     @BindView(R.id.tvDate)
     TextView date;
     @BindView(R.id.ivPicture)
@@ -66,6 +57,10 @@ public class ImageActivity extends CustomMenu {
     TextView etName;
     @BindView(R.id.spinner)
     Spinner spinner;
+    private String mTimestamp;
+    private ImageHandler imgHandler;
+    private ReceiptService receiptService;
+    private CategoryService categoryService;
 
     public ImageActivity() {
         super(true, true);
@@ -195,7 +190,7 @@ public class ImageActivity extends CustomMenu {
                 checkForPicture = true;
 
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Canceled...", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Cancelled...", Toast.LENGTH_LONG).show();
                 return;
 
             } else
@@ -292,27 +287,25 @@ public class ImageActivity extends CustomMenu {
      * Checks if the date is set, if date is not set save button will be disabled.
      * Date is set when picture is taken.
      */
-    private void checkForDate()
-    {
+    private void checkForDate() {
 
-            date.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        save.setEnabled(true);
-                }
+        date.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                save.setEnabled(true);
+            }
 
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        save.setEnabled(true);
-                }
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                save.setEnabled(true);
+            }
 
-                @Override
-                public void afterTextChanged(Editable editable) {
-                    save.setEnabled(true);
-                }
-            });
-        }
-
+            @Override
+            public void afterTextChanged(Editable editable) {
+                save.setEnabled(true);
+            }
+        });
+    }
 
 
     private void createOnCategoryRetrievedListener() {

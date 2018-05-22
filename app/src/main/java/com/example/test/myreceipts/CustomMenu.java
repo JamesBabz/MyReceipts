@@ -1,26 +1,22 @@
 package com.example.test.myreceipts;
 
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.test.myreceipts.BLL.CategoryService;
 import com.example.test.myreceipts.BLL.UserService;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by Jacob Enemark on 07-05-2018.
@@ -28,20 +24,18 @@ import org.w3c.dom.Text;
 
 public class CustomMenu extends AppCompatActivity {
 
-    private UserService mUserService;
-    private CategoryService categoryService;
-
-    private String m_Text = "";
-
     boolean backBtn;
     boolean profileMenuItem;
+    private UserService mUserService;
+    private CategoryService categoryService;
+    private String m_Text = "";
+
 
     public CustomMenu(Boolean backBtn, Boolean profileMenuItem) {
         mUserService = new UserService();
         categoryService = new CategoryService();
         this.backBtn = backBtn;
         this.profileMenuItem = profileMenuItem;
-
     }
 
     @Override
@@ -59,11 +53,22 @@ public class CustomMenu extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Goes back when backbutton is pressed
+     *
+     * @return true for success
+     */
     public boolean onSupportNavigateUp() {
         finish();
         return true;
     }
 
+    /**
+     * Handles what to do when an item is selected in the menu
+     *
+     * @param item The item selected
+     * @return true or success
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -88,18 +93,28 @@ public class CustomMenu extends AppCompatActivity {
         }
     }
 
+    /**
+     * Signs the user out and returns to login
+     */
     public void signOut() {
         mUserService.signOut();
         Intent intent = new Intent(CustomMenu.this, SignInActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Opens the profile view
+     */
     private void openProfileView() {
         Intent intent = new Intent(CustomMenu.this, ProfileActivity.class);
         intent.putExtra("USER", mUserService.getCurrentUser().getUid());
         startActivity(intent);
     }
 
+    /**
+     * Creates a dialog for "create category".
+     * Handles ok and cancel press
+     */
     private void openCreateCategoryDialog() {
         Builder builder = new Builder(this);
         builder.setTitle("Create category");
@@ -134,6 +149,10 @@ public class CustomMenu extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Creates a dialog for "delete category".
+     * Handles ok and cancel press
+     */
     private void openDeleteCategoryDialog() {
         Builder builder = new Builder(this);
         builder.setTitle("Delete category");
@@ -169,6 +188,10 @@ public class CustomMenu extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Creates a dialog for "rename category".
+     * Handles ok and cancel press
+     */
     private void openRenameCategoryDialog() {
 
 
@@ -192,10 +215,14 @@ public class CustomMenu extends AppCompatActivity {
                     dialog.cancel();
                     return;
                 }
-                categoryService.moveCategory(spinner.getSelectedItem().toString().toLowerCase(), input.getText().toString());
+                if (input.getText().toString().equals("")) {
+                    Toast.makeText(CustomMenu.this, "Rename failed. You did not input a new name", Toast.LENGTH_LONG).show();
+                } else {
+                    categoryService.moveCategory(spinner.getSelectedItem().toString().toLowerCase(), input.getText().toString());
 
-                //Creates category with input text as name
-                refreshPage();
+                    //Creates category with input text as name
+                    refreshPage();
+                }
 
             }
         });
@@ -209,6 +236,13 @@ public class CustomMenu extends AppCompatActivity {
         builder.show();
     }
 
+    /**
+     * Creates the dialog view for the "rename category" option
+     *
+     * @param spinner The spinner to hold the categories
+     * @param input   The input field for the new category name
+     * @return The builder with the added views
+     */
     private Builder createRenameView(Spinner spinner, EditText input) {
         Builder builder = new Builder(this);
         builder.setTitle("Rename category");
@@ -227,6 +261,12 @@ public class CustomMenu extends AppCompatActivity {
         return builder;
     }
 
+    /**
+     * Creates the container and child elements for the input text
+     *
+     * @param input The input field for the new category name
+     * @return The container with child elements
+     */
     private LinearLayout createTextContainer(EditText input) {
         // Create the renameText and label and put it into a container
         LinearLayout textContainer = new LinearLayout(this);
@@ -242,7 +282,12 @@ public class CustomMenu extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Creates the container and child elements for the category spinner
+     *
+     * @param spinner The spinner for the old category name
+     * @return The container with child elements
+     */
     private LinearLayout createSpinnerContainer(Spinner spinner) {
         LinearLayout spinnerContainer = new LinearLayout(this);
         spinnerContainer.setGravity(Gravity.CENTER);
@@ -253,11 +298,14 @@ public class CustomMenu extends AppCompatActivity {
         return spinnerContainer;
     }
 
+    /**
+     * Refresh page for new categories without animation
+     */
     private void refreshPage() {
-        //Refresh page for new categories
-        Intent intent = getIntent();
         finish();
-        startActivity(intent);
+        overridePendingTransition(0, 0);
+        startActivity(getIntent());
+        overridePendingTransition(0, 0);
     }
 
 }
